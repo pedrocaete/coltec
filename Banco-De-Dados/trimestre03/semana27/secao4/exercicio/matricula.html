@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Matrícula</title>
+        <link href="css/style.css" rel="stylesheet">
+    </head>
+    <body>
+        <h1>Matrícula</h1> 
+        <form action="aluno.php" method="post">
+            <label for="nome">Nome: </label>
+            <input type="text" name="nome" value=""> <br><br>
+
+            <label for="idade">Idade: </label>
+            <input type="number" name="idade" value="" step="1" min="14" max="21"> <br><br>
+
+            <label for="cidade">Cidade em que reside: </label>
+            <input type="text" name="cidade" value=""> <br><br>
+
+            <label for="matricula">Matrícula: </label>
+            <input type="text" name="matricula" value=""> <br><br>
+
+            <label for="curso">Curso: </label> <br><br>
+            <input type="radio" name="curso" value="Desenvolvimento de Sistemas"> Desenvolvimento de Sistemas <br>
+            <input type="radio" name="curso" value="Automação Industrial"> Automação Industrial <br>
+            <input type="radio" name="curso" value="Eletrônica"> Eletrônica <br>
+            <input type="radio" name="curso" value="Análises Clínicas"> Análises Clínicas <br>
+            <input type="radio" name="curso" value="Química"> Química <br><br>
+
+            <label for="periodo">Período do Curso: </label>
+            <input type="number" name="periodo" value="" step="1" min="0" max="8"> <br><br>
+        </form>
+    </body>
+</html>

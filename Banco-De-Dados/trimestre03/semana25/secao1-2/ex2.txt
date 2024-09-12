@@ -1,0 +1,1 @@
+Variáveis escalares (int, float, string, bool), compostas (array, object), especiais (null, resource), variáveis callable (que podem ser chamadas como uma função).
