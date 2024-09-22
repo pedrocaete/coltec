@@ -5,7 +5,7 @@ error_reporting(-1);
 
 function connectDB()
 {
-    $db = 'mydb';
+    $db = 'site1';
     $host = '172.17.0.2';
     $charset = 'utf8mb4';
 
