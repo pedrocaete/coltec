@@ -6,6 +6,7 @@ class Organismo {
   float velocidadeMax;
   float percepcao; // Distância máxima para detectar recursos
   float tamanho;
+  int sexo;
   
   Organismo(PVector posicao, float[] dna) {
     this.posicao = posicao.copy();
@@ -17,6 +18,7 @@ class Organismo {
     this.percepcao = map(dna[1], 0, 1, 50, 200);
     this.tamanho = map(dna[2], 0, 1, 4, 8);
     this.velocidade = PVector.random2D();
+    this.sexo = ((this.velocidadeMax + this.tamanho) % 2) == 0 ? 0 : 1;
   }
   
   void atualiza() {
