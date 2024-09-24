@@ -48,6 +48,8 @@ void draw() {
       Organismo filho = o.reproduzir();
       if (filho != null) {
         populacao.add(filho);
+        fill(0);
+        ellipse(filho.posicao.x,filho.posicao.y, 100, 100);
       }
     }
   }

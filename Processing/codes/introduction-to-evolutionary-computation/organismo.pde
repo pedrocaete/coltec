@@ -67,13 +67,12 @@ class Organismo {
 
   Organismo procuraParceiro() {
     Organismo maisProximo = null;
-    float dist = Float.MAX_VALUE;
 
     for (Organismo r : populacao) {
       float d = PVector.dist(posicao, r.posicao);
-      if (d < dist && d < 50 && temSexoDiferente(r)) {
-        dist = d;
+      if (d < 50 && temSexoDiferente(r)) {
         maisProximo = r;
+        break;
       }
     }
     return maisProximo;
@@ -82,17 +81,24 @@ class Organismo {
   Organismo reproduzir() {
     // Reproduz com uma probabilidade baseada na saúde
     Organismo parceiro = procuraParceiro();
-    if (random(1) < 0.005 && vida > 50 && parceiro != null) {
+    if (random(1) < 0.005 && vida > 30 && parceiro != null) {
 
       float[] novoDna = new float[3];
       for (int i = 0; i < dna.length; i++) {
-        novoDna[i] = dna[i] * parceiro.dna[i];
+          if (floor(random(0,2)) == 0){
+            novoDna[i] = dna[i];
+          }
+          else{
+            novoDna[i] = parceiro.dna[i];
+          }
+        
       }
       // mutacao
       for (int k = 0; k < novoDna.length; k++)
         if (random(1) < 0.001) novoDna[k] = constrain(novoDna[k] + random(-0.1, 0.1), 0, 1);
-println(this.dna);
+      println(this.dna);
       vida-=10;
+
       return new Organismo(posicao, novoDna);
     } else {
       return null;
