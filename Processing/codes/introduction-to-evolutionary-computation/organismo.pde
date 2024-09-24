@@ -18,7 +18,7 @@ class Organismo {
     this.percepcao = map(dna[1], 0, 1, 50, 200);
     this.tamanho = map(dna[2], 0, 1, 4, 8);
     this.velocidade = PVector.random2D();
-    this.sexo = ((this.velocidadeMax + this.tamanho) % 2) == 0 ? 0 : 1;
+    this.sexo = ((this.velocidadeMax + this.tamanho + this.percepcao) % 2) == 0 ? 0 : 1;
   }
   
   void atualiza() {
@@ -60,6 +60,7 @@ class Organismo {
       }
     }
   }
+  
   
   Organismo reproduzir() {
     // Reproduz com uma probabilidade baseada na saúde
