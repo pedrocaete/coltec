@@ -21,6 +21,35 @@ body {
     align-items: center;
 }
 
+.upperText {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    /* remove a decoração do link */
+    display: inline-block;
+    /* faz com que o link seja um bloco */
+}
+
+.button {
+    padding: 10px 20px;
+    background-color: #ffffff;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+
+    /* remove a decoração do link */
+    /* faz com que o link seja um bloco */
+}
+
 input[type="submit"] {
     color: black;
     border: none;
@@ -39,16 +68,4 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.button {
-    border: 3px solid white;
-    width: 10px;
-    padding: 10px;
-    height: 10px;
-    position: fixed;
-    top: 0;
-    right: 50px;
-    box-sizing: border-box;
-    cursor: pointer;
 }
