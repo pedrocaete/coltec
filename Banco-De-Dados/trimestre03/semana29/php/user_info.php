@@ -22,7 +22,9 @@
     echo "<div class='mainText'>";
     echo 'Nome: ' . $user->username . '<br>' .
         'Email :' .  $user->email . '<br>' .
-        'Data de nascimento: ' . $user->birth . '<br>';
+        'Data de nascimento: ' . $user->birth . '<br>' .
+        'Cargo: ' . $user->acesso . '<br>';
+
     ?>
     </div>
     <a class='button' href='alter_data.php'>Alterar Dados</a><br>
