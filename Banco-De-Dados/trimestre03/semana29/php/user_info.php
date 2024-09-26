@@ -21,15 +21,26 @@
     $user = User::unserialize($_SESSION['User']);
     echo "<div class='mainText'>";
     echo 'Nome: ' . $user->username . '<br>' .
-        'Email :' .  $user->email . '<br>' .
+        'Email: ' .  $user->email . '<br>' .
         'Data de nascimento: ' . $user->birth . '<br>' .
         'Cargo: ' . $user->acesso . '<br>';
 
     ?>
     </div>
-    <a class='button' href='alter_data.php'>Alterar Dados</a><br>
-    <a class='button' href='change_password.php'>Alterar Senha</a><br>
+    <div id='bah'>
+        <a class='button' href='alter_data.php'>Alterar Dados</a><br>
+        <a class='button' href='change_password.php'>Alterar Senha</a><br>
+        <a class='button' href='remove_user.php'>Remover Usuário</a><br>
+    </div>
     <a class='upperText' href='logout.php'>Logout</a><br>
+    <?php
+        if($user->acesso == 'gerente'){
+        echo "<a href='area_gerente.php'>Área Gerente</a>";
+        }
+        if($user->acesso == 'admin'){
+        echo "<a href='area_admin.php'>Área Admin</a>";
+        }
+    ?>
 </body>
 
 </html>

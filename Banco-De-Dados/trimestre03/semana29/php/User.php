@@ -228,16 +228,24 @@ class User
 
     private function alterDatabaseData()
     {
-        $sql = 'UPDATE pessoa SET nome=?, nascimento=? WHERE email=?';
+        $sql = 'UPDATE pessoa SET nome=?, nascimento=?, email=? WHERE id=?';
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$this->username, $this->birth, $this->email]);
+        $stmt->execute([$this->username, $this->birth, $this->email, $this->id]);
     }
+
+//    public static function alterDatabaseDataUser($username, $birth, $email, $id, $pdo)
+//    {
+//        $sql = 'UPDATE pessoa SET nome=?, nascimento=?, email=? WHERE id=?';
+//        $stmt = $this->pdo->prepare($sql);
+//        $stmt->execute([$username, $birth, $email, $id]);
+//    }
 
     public function alterData()
     {
         if (isset($_POST['submit'])) {
             $this->username = $this->getUsername();
             $this->birth = $this->getBirth();
+            $this->email = $this->getEmail();
             $this->alterDatabaseData();
             $_SESSION['User'] = $this->serialize();
             return true;
@@ -268,6 +276,18 @@ class User
         $sql = "delete from pessoa where email =?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$this->email]);
+        if ($stmt) {
+            echo "Usuário removido com sucesso!";
+        } else {
+            echo "Erro ao remover usuário";
+        }
+    }
+
+    public static function removeUser($email, $pdo)
+    {
+        $sql = "delete from pessoa where email =?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$email]);
         if ($stmt) {
             echo "Usuário removido com sucesso!";
         } else {

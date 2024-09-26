@@ -9,10 +9,9 @@ require_once "User.php";
 session_start();
 $user = User::unserialize($_SESSION['User']);
 
-require '../html/remove_user.html';
+require '../html/remove_users.html';
 
-if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['remover'])) {
-$user->remove();
-header('Location: cadastro.php');
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['remover'])) {
+    $email = $_POST['email'];
+    User::removeUser($email, connectDB());
 }
-

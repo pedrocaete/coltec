@@ -12,6 +12,9 @@
     <div class='mainText'>
         <form action="alter_data.php" method="post">
             <h1>Alterar Dados</h1>
+            <label for="email">Email: </label> <br>
+            <input type="text" name="email" value="<?php echo $user->email ?>"><br> <br>
+
             <label for="user">Nome de usuário: </label> <br>
             <input type="text" name="user" value="<?php echo $user->username ?>"><br> <br>
 
@@ -22,6 +25,7 @@
             <input type="submit" name="submit" value="Alterar"> <br><br>
         </form>
     </div>
+    <a class='upperText' href='../php/user_info.php'>Voltar</a><br>
 </body>
 
 </html>
