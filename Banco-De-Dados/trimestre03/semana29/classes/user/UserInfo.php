@@ -1,22 +1,23 @@
 <?php
 
-require_once "../database/db_config.php";
+require_once dirname(__FILE__) . '/../Database.php';
 require_once "UserDAO.php";
 require_once "User.php";
 require_once "UserLogin.php";
-require_once "Form.php";
+require_once dirname(__FILE__) . "/../Form.php";
 
 class UserInfo extends UserLogin
 {
     public function __construct()
     {
         session_start();
-        $this = User::unserialize($_SESSION['User']);
+        $this->restoreFromSession();
     }
 
     public static function listAll()
     {
         $list = UserDAO::listAll();
+        echo "<table border='1'>";
         foreach ($list as $row) {
             echo "<tr>" .
                 "<td>" . $row['id'] . "</td>" .
@@ -51,6 +52,16 @@ class UserInfo extends UserLogin
             return true;
         } else {
             echo '<p style="color:red">Senha de confirmação diverge da nova senha </p>';
+        }
+    }
+
+    public function remove()
+    {
+        if (UserDAO::remove($this->email)
+        ) {
+            echo "Usuário removido com sucesso!";
+        } else {
+            echo "Erro ao remover usuário";
         }
     }
 }

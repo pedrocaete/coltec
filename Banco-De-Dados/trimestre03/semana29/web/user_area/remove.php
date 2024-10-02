@@ -4,15 +4,14 @@ ini_set('display_startup_errors', 1);
 ini_set('display_errors', 1);
 error_reporting(-1);
 
-require_once "User.php";
+require_once "../../classes/user/UserInfo.php";
 
-session_start();
-$user = User::unserialize($_SESSION['User']);
+$user = new UserInfo();
 
-require '../html/remove_user.html';
+require 'remove.html';
 
 if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['remover'])) {
 $user->remove();
-header('Location: cadastro.php');
+header('Location: ../register/register.php');
 }
 

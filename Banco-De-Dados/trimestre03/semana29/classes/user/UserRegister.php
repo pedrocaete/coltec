@@ -1,9 +1,8 @@
 <?php
-
-require_once "../database/db_config.php";
+require_once dirname(__FILE__) . '/../Database.php';
 require_once "UserDAO.php";
 require_once "User.php";
-require_once "Form.php";
+require_once dirname(__FILE__) . "/../Form.php";
 
 class UserRegister extends User
 {
@@ -14,12 +13,15 @@ class UserRegister extends User
         $this->email = Form::getEmail();
         $this->birth = Form::getBirth();
         $this->acesso = Form::getAcesso();
+        $this->status = UserDAO::getStatus($this->email);
     }
-        
+
     public function register()
     {
         if (UserDAO::exists($this->email)) {
             echo "Já há um usuário associado a este email";
+        } elseif (! $this->isActive()) {
+            echo "Usuário desativado. Peça ao admin para ativar";
         } else {
             UserDAO::insert($this->username, $this->email, $this->password, $this->birth, $this->acesso);
             $this->startSession();

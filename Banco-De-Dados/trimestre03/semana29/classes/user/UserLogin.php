@@ -1,9 +1,9 @@
 <?php
 
-require_once "../database/db_config.php";
+require_once dirname(__FILE__) . '/../Database.php';
 require_once "UserDAO.php";
 require_once "User.php";
-require_once "Form.php";
+require_once dirname(__FILE__) . "/../Form.php";
 
 class UserLogin extends User
 {
@@ -16,7 +16,7 @@ class UserLogin extends User
     private function verifyUser()
     {
         $password = Form::getPassword();
-        if (UserDAO::exists($this->email, $this->pdo)) {
+        if (UserDAO::exists($this->email)) {
             if ($this->checkPassword($password)) {
                 return true;
             } else {
@@ -41,20 +41,25 @@ class UserLogin extends User
     {
         if ($this->verifyUser()) {
             $this->getData();
-            $this->startSession();
-            echo "Logado";
-            return true;
+            if ($this->isActive()) {
+                $this->startSession();
+                echo "Logado";
+                return true;
+            } else {
+                echo "Usuário desativado. Peça ao admin para ativar";
+            }
         }
     }
 
-    public function getData(){
+    public function getData()
+    {
         $data = UserDAO::getData($this->email);
         $this->username = $data['nome'];
-        $this->password =$data['senha'];
-        $this->email =$data['email'];
-        $this->birth =$data['nascimento'];
-        $this->acesso =$data['acesso'];
+        $this->password = $data['senha'];
+        $this->email = $data['email'];
+        $this->birth = $data['nascimento'];
+        $this->acesso = $data['acesso'];
         $this->id = $data['id'];
+        $this->status = $data['status'];
     }
-
 }

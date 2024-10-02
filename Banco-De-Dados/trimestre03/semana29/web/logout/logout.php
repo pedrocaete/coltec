@@ -6,4 +6,4 @@ error_reporting(-1);
 
 session_start();
 session_destroy();
-header('Location: cadastro.php');
+header('Location: ../register/register.php');

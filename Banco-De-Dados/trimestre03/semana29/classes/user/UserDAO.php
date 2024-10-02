@@ -1,6 +1,6 @@
 <?php
 
-require_once "../database/Database.php";
+require_once dirname(__FILE__) . '/../Database.php';
 
 class UserDAO
 {
@@ -53,11 +53,25 @@ class UserDAO
         $sql = "DELETE FROM pessoa WHERE email =?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$email]);
-        if ($stmt) {
-            echo "Usuário removido com sucesso!";
-        } else {
-            echo "Erro ao remover usuário";
-        }
+        return $stmt;
+    }
+
+    public static function activate($email)
+    {
+        $pdo = Database::getInstance()->getPdo();
+        $sql = 'UPDATE pessoa SET status="ativo" WHERE email=?';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$email]);
+        return $stmt;
+    }
+
+    public static function desactivate($email)
+    {
+        $pdo = Database::getInstance()->getPdo();
+        $sql = 'UPDATE pessoa SET status="inativo" WHERE email=?';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$email]);
+        return $stmt;
     }
 
     public static function listAll()
@@ -125,9 +139,9 @@ class UserDAO
     public static function getPassword($email)
     {
         $pdo = Database::getInstance()->getPdo();
-        $sql = "SELECT password FROM pessoa WHERE email=?";
+        $sql = "SELECT senha FROM pessoa WHERE email=?";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute($email);
+        $stmt->execute([$email]);
         $password = $stmt->fetchColumn();
 
         return $password;

@@ -7,20 +7,21 @@ class Database
 {
     private static $instance;
     private $pdo;
-    const DB = 'sistema';
-    const HOST = '172.17.0.2';
-    const CHARSET = 'utf8mb4';
-    const DSN = "mysql:host=$host;dbname=$db;charset=$charset";
-    const USER = 'pedro';
+    private $db = 'sistema';
+    private $host = '172.17.0.2';
+    private $charset = 'utf8mb4';
+    private $dsn; 
+    private $user = 'pedro';
     private $pass = 'pedro';
-    const OPTIONS = array(
+    private $options = array(
         PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4'
     );
 
     private function __construct()
     {
+        $this->dsn= "mysql:host=$this->host;dbname=$this->db;charset=$this->charset";
         try {
-            $this->pdo = new PDO(DSN, USER, $this->pass, OPTIONS);
+            $this->pdo = new PDO($this->dsn, $this->user, $this->pass, $this->options);
         } catch (PDOException $e) {
             echo 'Erro ao conectar com o BD:' . $e->getMessage();
             exit;
