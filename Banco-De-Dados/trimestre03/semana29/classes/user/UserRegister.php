@@ -20,8 +20,6 @@ class UserRegister extends User
     {
         if (UserDAO::exists($this->email)) {
             echo "Já há um usuário associado a este email";
-        } elseif (! $this->isActive()) {
-            echo "Usuário desativado. Peça ao admin para ativar";
         } else {
             UserDAO::insert($this->username, $this->email, $this->password, $this->birth, $this->acesso);
             $this->startSession();

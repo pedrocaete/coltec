@@ -72,6 +72,7 @@ class Form
             return $newPassword;
         }
     }
+
     public static function getConfirmPassword()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
@@ -81,6 +82,18 @@ class Form
                 exit;
             }
             return $confirmPassword;
+        }
+    }
+
+    public static function getNewStatus()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
+            $newStatus = $_POST['newStatus'];
+            if (empty($newStatus)){
+                echo '<p style="color:red">Preencha todos os campos</p>';
+                exit;
+            }
+            return $newStatus;
         }
     }
 }

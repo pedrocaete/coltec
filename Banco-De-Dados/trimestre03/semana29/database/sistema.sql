@@ -8,19 +8,19 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 -- -----------------------------------------------------
--- Schema sistema
+-- Schema a2023951431@teiacoltec.org
 -- -----------------------------------------------------
 
 -- -----------------------------------------------------
--- Schema sistema
+-- Schema a2023951431@teiacoltec.org
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `sistema` DEFAULT CHARACTER SET utf8 ;
-USE `sistema` ;
+CREATE SCHEMA IF NOT EXISTS `a2023951431@teiacoltec.org` DEFAULT CHARACTER SET utf8 ;
+USE `a2023951431@teiacoltec.org` ;
 
 -- -----------------------------------------------------
--- Table `sistema`.`pessoa`
+-- Table `a2023951431@teiacoltec.org`.`pessoa`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `sistema`.`pessoa` (
+CREATE TABLE IF NOT EXISTS `a2023951431@teiacoltec.org`.`pessoa` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `nome` VARCHAR(45) NOT NULL,
   `email` VARCHAR(45) NOT NULL,

@@ -24,6 +24,7 @@ class UserInfo extends UserLogin
                 "<td>" . $row['nome'] . "</td>" .
                 "<td>" . $row['email'] . "</td>" .
                 "<td>" . $row['acesso'] . "</td>" .
+                "<td>" . $row['status'] . "</td>" .
                 "</tr>";
         }
         echo "</table>";

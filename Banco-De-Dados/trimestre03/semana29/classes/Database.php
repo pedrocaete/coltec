@@ -7,12 +7,12 @@ class Database
 {
     private static $instance;
     private $pdo;
-    private $db = 'sistema';
-    private $host = '172.17.0.2';
+    private $db = 'a2023951431@teiacoltec.org';
+    private $host = 'localhost';
     private $charset = 'utf8mb4';
     private $dsn; 
-    private $user = 'pedro';
-    private $pass = 'pedro';
+    private $user = 'a2023951431@teiacoltec.org';
+    private $pass = '@Coltec2024';
     private $options = array(
         PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4'
     );
