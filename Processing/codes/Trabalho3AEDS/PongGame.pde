@@ -14,13 +14,13 @@ class PongGame {
     bola = new Bola(width / 2, height / 2, 5, 5, 20);
     raqueteEsquerda = new Raquete(20, height / 2 - 40, 10, 80, 8);
     raqueteDireita = new Raquete(width - 30, height / 2 - 40, 10, 80, 8);
-    agenteRL = new AgenteRL(0.5, 0.95, 0.1, 0.01, 0.01);
+    agenteRL = new AgenteRL(0.1, 0, 0.1, 0.01, 0.01);
   }
 
   String obterEstadoRaqueteDireita() {
-    int bolaX = round(map(bola.posicaoX, 0, width, 0, width)); // ou apenas bola.posicaoX se não precisar de mapeamento
-    int aberturaErro = round(map(raqueteDireita.posicaoY - bola.posicaoY, 0, height, 0, 80));
-    return  bolaX + "," + aberturaErro;
+    int bolaY = round(map(bola.posicaoY, 0, height, 0, 10));
+    int raqueteY = round(map(raqueteDireita.posicaoY, 0, height, 0, 10));
+    return bolaY + "," + raqueteY;
   }
 
   boolean raqueteDireitaAcertou() {
@@ -31,15 +31,14 @@ class PongGame {
     // Atualizar valor Q após a ação
     float recompensa;
     if (raqueteDireitaAcertou()) {
-      recompensa = width;
-    } else if(bola.posicaoX >= width){
+      recompensa = 100;
+    } else if (bola.posicaoX >= width) {
       recompensa = - abs(raqueteDireita.posicaoY -  bola.posicaoY);
-    }
-    else recompensa = -1;
+    } else recompensa = -1;
     println(recompensa);
 
     String estadoAtual = obterEstadoRaqueteDireita();
-    agenteRL.atualizarValorQ(estadoUltimaAcao, ultimaAcao, recompensa, estadoAtual);
+    agenteRL.atualizarValorQ(estadoUltimaAcao, ultimaAcao, recompensa);
 
     ultimaAcao = agenteRL.escolherAcao(estadoAtual);
     if (ultimaAcao == 1) raqueteDireita.movimentar(1);
@@ -63,10 +62,10 @@ class PongGame {
       bola.inverterDirecaoX();
     }
 
-    //if (bola.posicaoX < 0) {
-    //  pontosp2++;
+    if (bola.posicaoX < 0) {
+    pontosp2++;
     //  reiniciarJogo();
-    /*} else*/    if (bola.posicaoX > width) {
+    }else    if (bola.posicaoX > width) {
       pontosp1++;
       reiniciarJogo();
     }
@@ -92,7 +91,7 @@ class PongGame {
     bola.posicaoY = height / 2;
     //bola.velocidadeX = random(3, 6) * (random(1) < 0.5 ? 1 : -1);
     bola.velocidadeX = 10 * 1;
-    bola.velocidadeY = 6 * 1;
+    bola.velocidadeY = 3 * 1;
     //bola.velocidadeY = random(3, 6) * (random(1) < 0.5 ? 1 : -1);
     raqueteEsquerda.posicaoY = height / 2 - raqueteEsquerda.altura / 2;
     raqueteDireita.posicaoY = height / 2 - raqueteDireita.altura / 2;

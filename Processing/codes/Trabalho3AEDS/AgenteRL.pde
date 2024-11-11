@@ -23,10 +23,9 @@ class AgenteRL {
     return tabelaQ.get(chave);
   }
   
-  void atualizarValorQ(String estado, int acao, float recompensa, String proximoEstado) {
+  void atualizarValorQ(String estado, int acao, float recompensa) {
     float qAtual = obterValorQ(estado, acao); //<>//
-    float maxProximoQ = max(obterValorQ(proximoEstado, 0), obterValorQ(proximoEstado, 1));
-    float novoQ = qAtual + taxaAprendizagem * (recompensa + fatorDesconto * maxProximoQ - qAtual);
+    float novoQ = qAtual + taxaAprendizagem * (recompensa - qAtual);
     tabelaQ.put(estado + "," + acao, novoQ);
     incrementarEpisodios();
   }
