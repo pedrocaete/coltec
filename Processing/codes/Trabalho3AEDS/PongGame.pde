@@ -19,13 +19,13 @@ class PongGame {
   }
 
   String obterEstadoRaqueteDireita() {
-    int posRelativa = round((bola.posicaoY - raqueteDireita.posicaoY-40)); // Estado mais simples e relativo
+    int posRelativa = round((bola.posicaoY - raqueteDireita.posicaoY-40));
     return posRelativa < 0 ? "acima" : (posRelativa > 0 ? "abaixo" : "alinhado");
 
   }
 
   String obterEstadoRaqueteEsquerda() {
-    int posRelativa = round((bola.posicaoY - raqueteEsquerda.posicaoY-40)); // Estado mais simples e relativo
+    int posRelativa = round((bola.posicaoY - raqueteEsquerda.posicaoY-40));
     return posRelativa < 0 ? "acima" : (posRelativa > 0 ? "abaixo" : "alinhado");
   }
 
