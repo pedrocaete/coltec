@@ -27,6 +27,10 @@ class UserSession
         }
     }
 
+    public function destroySession($user)
+    {
+    }
+
     public function isLoggedIn()
     {
 

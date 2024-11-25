@@ -15,10 +15,11 @@ require_once "../classes/User.php";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Usuário e Compras no Periodo</title>
-    <link href="../../css/style.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
 </head>
 
 <body>
+    <div class="container">
         <form method="post">
             <label for="initialDate">Escolha a Data Inicial:</label>
             <input type="date" name="initialDate" required><br>
@@ -39,13 +40,15 @@ require_once "../classes/User.php";
 
             <input type="submit" name="submit" value="Enviar">
         </form>
+        <?php
+
+        if (isset($_POST['submit'])) {
+            User::getDataByCpf(Form::getCpf());
+            User::listPurchasesByTimePeriod(Form::getCpf(), Form::getField("initialDate"), Form::getField("finalDate"));
+        }
+        ?>
+    <a href='consultas.html'>Voltar</a><br>
+    </div>
 </body>
 
 </html>
-
-<?php
-
-if(isset($_POST['submit'])){
-    User::getDataByCpf(Form::getCpf());
-    User::listPurchasesByTimePeriod(Form::getCpf(), Form::getField("initialDate"), Form::getField("finalDate"));
-}

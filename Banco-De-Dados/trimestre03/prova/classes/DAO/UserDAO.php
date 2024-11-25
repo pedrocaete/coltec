@@ -25,7 +25,8 @@ class UserDAO
     public static function listAll()
     {
         $pdo = Database::getInstance()->getPdo();
-        $sql = "SELECT * FROM prova_usuario";
+        $sql = "SELECT * FROM prova_usuario
+                ORDER BY cpf ASC;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

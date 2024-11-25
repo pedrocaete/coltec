@@ -23,7 +23,8 @@ class EstablishmentDAO
 
     public static function listAll(){
         $pdo = Database::getInstance()->getPdo();
-        $sql = "SELECT * FROM prova_estabelecimento";
+        $sql = "SELECT * FROM prova_estabelecimento
+                ORDER BY cnpj ASC;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

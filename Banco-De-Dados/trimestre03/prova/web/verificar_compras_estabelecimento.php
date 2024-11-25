@@ -14,23 +14,23 @@ require_once "../classes/UserSession.php";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Verificar Compras</title>
-    <link href="../../css/style.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
 </head>
 
 <body>
-    <div class='mainText'>
+    <div class="container">
+        <?php
+
+        require_once "../classes/Establishment.php";
+        require_once "../classes/EstablishmentSession.php";
+
+        $establishmentSession = new EstablishmentSession();
+        $establishmentSession->useSession();
+        $establishment = $establishmentSession->establishment;
+        $establishment->listPurchases();
+        ?>
+        <a href='menu_estabelecimento.html'>Voltar</a>
     </div>
-    <a class='upperText' href='../login/login.php'>Login</a>
 </body>
 
 </html>
-
-<?php
-
-require_once "../classes/Establishment.php";
-require_once "../classes/EstablishmentSession.php";
-
-$establishmentSession = new EstablishmentSession();
-$establishmentSession->useSession();
-$establishment = $establishmentSession->establishment;
-$establishment->listPurchases();

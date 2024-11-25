@@ -14,20 +14,20 @@ require_once "../classes/UserSession.php";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Verificar Compras</title>
-    <link href="../../css/style.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
 </head>
 
 <body>
-    <div class='mainText'>
+    <div class="container">
+        <?php
+        $userSession = new UserSession();
+        $userSession->useSession();
+        $user = $userSession->user;
+        $user->getData();
+        $user->listPurchases();
+        ?>
+        <a href='menu_usuario.html'>Voltar</a>
     </div>
-    <a class='upperText' href='../login/login.php'>Login</a>
 </body>
 
 </html>
-
-<?php
-    $userSession = new UserSession();
-    $userSession->useSession();
-    $user = $userSession->user;
-    $user->getData();
-    $user->listPurchases();

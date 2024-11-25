@@ -132,7 +132,7 @@ class User
         echo "<p><strong>Nome:</strong> " . htmlspecialchars($this->name) . "</p>";
         echo "<p><strong>Email:</strong> " . htmlspecialchars($this->email) . "</p>";
         echo "<p><strong>Telefone:</strong> " . htmlspecialchars($this->phone) . "</p>";
-        echo "<p><strong>Pontos:</strong> " . htmlspecialchars(UserDAO::getPoints($this->cpf)) . "</p>";
+        echo "<p><strong>Pontos:</strong> " . (UserDAO::getPoints($this->cpf)) . "</p>";
         echo "</div>";
     }
 
@@ -144,7 +144,7 @@ class User
         echo  "<p><strong>Nome:</strong> " . htmlspecialchars(UserDAO::getName($cpf)) . "</p>";
         echo  "<p><strong>Email:</strong> " . htmlspecialchars(UserDAO::getEmail($cpf)) . "</p>";
         echo  "<p><strong>Telefone:</strong> " . htmlspecialchars(UserDAO::getPhone($cpf)) . "</p>";
-        echo  "<p><strong>Pontos:</strong> " . htmlspecialchars(UserDAO::getPoints($cpf)) . "</p>";
+        echo  "<p><strong>Pontos:</strong> " . (UserDAO::getPoints($cpf)) . "</p>";
         echo  "</div>";
     }
 

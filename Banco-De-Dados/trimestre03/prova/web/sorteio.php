@@ -16,13 +16,16 @@ $usuarioSorteado = User::sortUser();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sorteio de Usuário</title>
+    <link href="css/style.css" rel="stylesheet">
 </head>
 
 <body>
-    <h1>Sorteio de Usuário</h1>
-        <p>O usuário sorteado para ganhar <?php echo PurchaseDAO::getTotalValue()?> é:</p>
-    <div class="resultado">
-        <?php echo $usuarioSorteado['nome'] . "<br> CPF: " . $usuarioSorteado['cpf']; ?>
+    <div class="container">
+        <h1>Sorteio de Usuário</h1>
+        <p>O usuário sorteado para ganhar <?php echo PurchaseDAO::getTotalValue() ?> é:</p>
+        <div class="resultado">
+            <?php echo $usuarioSorteado['nome'] . "<br> CPF: " . $usuarioSorteado['cpf']; ?>
+        </div>
     </div>
 </body>
 
