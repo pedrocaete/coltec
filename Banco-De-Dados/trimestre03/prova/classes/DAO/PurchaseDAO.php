@@ -42,11 +42,12 @@ class PurchaseDAO
     public static function listAllByCpfAndTimePeriod($cpf, $initialDate, $finalDate)
     {
         $pdo = Database::getInstance()->getPdo();
-        $sql = "SELECT * FROM prova_compra WHERE cpf_usuario = ?
-                WHERE c.data BETWEEN ? AND ? 
+        $sql = "SELECT * FROM prova_compra c 
+                WHERE cpf_usuario = ?
+                AND c.data BETWEEN ? AND ?
                 ORDER BY data DESC;";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$cpf]);
+        $stmt->execute([$cpf, $initialDate, $finalDate]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -61,13 +62,23 @@ class PurchaseDAO
 
     public static function listTotalValueByTimePeriod($initialDate, $finalDate){
         $pdo = Database::getInstance()->getPdo();
-        $sql = "SELECT SUM(c.valor) AS VENDAS
+        $sql = "SELECT SUM(c.valor) AS vendas
                 FROM prova_compra c
                 WHERE c.data BETWEEN ? AND ?;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$initialDate, $finalDate]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchColumn();
     }
+
+    public static function getTotalValue(){
+        $pdo = Database::getInstance()->getPdo();
+        $sql = "SELECT SUM(c.valor) AS vendas
+                FROM prova_compra c;";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
 
     private static function fetchColumn($id, $column)
     {

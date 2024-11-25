@@ -8,7 +8,7 @@ require_once "Exceptions/EmptyFieldException.php";
 class Form
 {
 
-    private static function getField($requiredField)
+    public static function getField($requiredField)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
             $field = $_POST[$requiredField];

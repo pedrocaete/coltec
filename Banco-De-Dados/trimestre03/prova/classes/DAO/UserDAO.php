@@ -22,7 +22,8 @@ class UserDAO
         }
     }
 
-    public static function listAll(){
+    public static function listAll()
+    {
         $pdo = Database::getInstance()->getPdo();
         $sql = "SELECT * FROM prova_usuario";
         $stmt = $pdo->prepare($sql);
@@ -30,17 +31,17 @@ class UserDAO
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function listAllByCpf($cpf){
+    public static function listAllByCpf($cpf)
+    {
         $pdo = Database::getInstance()->getPdo();
         $sql = "SELECT nome, email, telefone, cpf FROM prova_usuario WHERE cpf = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$cpf]);
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if ($result){
+        if ($result) {
             return $result;
-        }
-        else {
-            throw new EmptyDatabaseColumnException("Colunas não preenchidas para usuário com CPF " . $cpf );
+        } else {
+            throw new EmptyDatabaseColumnException("Colunas não preenchidas para usuário com CPF " . $cpf);
         }
     }
 
@@ -51,11 +52,10 @@ class UserDAO
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$cpf]);
         $result = $stmt->fetchColumn();
-        if ($result){
+        if ($result) {
             return $result;
-        }
-        else {
-            throw new EmptyDatabaseColumnException("Coluna " . $column . " vazia para usuário com CPF " . $cpf );
+        } else {
+            throw new EmptyDatabaseColumnException("Coluna " . $column . " vazia para usuário com CPF " . $cpf);
         }
     }
 
@@ -65,6 +65,19 @@ class UserDAO
         $sql = "UPDATE prova_usuario SET $column = ? WHERE cpf = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$value, $cpf]);
+    }
+
+    public static function getAllUsersWithPoints()
+    {
+        $pdo = Database::getInstance()->getPdo();
+        $sql = "SELECT u.nome, u.email, u.telefone, u.cpf, FLOOR(SUM(c.valor)/100) AS pontos
+                FROM prova_usuario u
+                JOIN `prova_compra` c ON u.cpf = c.cpf_usuario
+                GROUP BY u.cpf;";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
     }
 
     // Getters
@@ -86,6 +99,17 @@ class UserDAO
     public static function getPassword($cpf)
     {
         return self::fetchColumn($cpf, 'senha');
+    }
+
+    public static function getPoints($cpf)
+    {
+        $pdo = Database::getInstance()->getPdo();
+        $sql = "SELECT FLOOR(SUM(c.valor)/100)
+                FROM `prova_compra` c
+                WHERE c.cpf_usuario = ?;";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$cpf]);
+        return $stmt->fetchColumn();
     }
 
     // Updaters

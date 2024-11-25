@@ -31,3 +31,4 @@ require_once "../classes/UserSession.php";
     $userSession->useSession();
     $user = $userSession->user;
     $user->listPurchases();
+    $user->getData();

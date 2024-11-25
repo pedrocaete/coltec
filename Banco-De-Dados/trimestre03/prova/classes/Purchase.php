@@ -34,7 +34,6 @@ class Purchase
 
     public static function listSalesOnPeriod($intialDate, $finalDate)
     {
-        $table = PurchaseDAO::listTotalValueByTimePeriod($intialDate, $finalDate);
         echo "<table border='1'>
                 <thead>
                     <tr>
@@ -43,8 +42,8 @@ class Purchase
                 </thead>
                     <tbdody>";
         echo "<tr>";
-        echo "<th>" . $intialDate . "a" . $finalDate . "</th>";
-        echo "<td>" . Purchase::listSalesOnPeriod($intialDate, $finalDate) . "</td>";
+        echo "<th>" . $intialDate . " a " . $finalDate . "</th>";
+        echo "<td>" . PurchaseDAO::listTotalValueByTimePeriod($intialDate, $finalDate) . "</td>";
         echo "</tr>";
         echo "</tbody>
                 </table>";

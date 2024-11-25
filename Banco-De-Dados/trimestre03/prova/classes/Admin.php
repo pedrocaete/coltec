@@ -39,6 +39,7 @@ class Admin
         echo "</tbody>
                 </table>";
     }
+
     public static function listEstablishmentsSalesByMonth($month, $year)
     {
         $table = DAO::listEstablishmentsSellsByMonth($month, $year);
@@ -58,6 +59,33 @@ class Admin
             echo "<td>" . $row['nome'] . "</td>";
             echo "<td>" . $row['email'] . "</td>";
             echo "<td>" . $row['vendas'] . "</td>";
+            echo "</tr>";
+        }
+        echo "</tbody>
+                </table>";
+    }
+
+    public static function listEstablishmentsAndSales()
+    {
+        $table = DAO::listEstablishmentsAndSales();
+        echo "<table border='1'>
+                <thead>
+                    <tr>
+                        <th scope='col'>CNPJ</th>
+                        <th scope='col'>Nome</th>
+                        <th scope='col'>Email</th>
+                        <th scope='col'>Data</th>
+                        <th scope='col'>Valor</th>
+                    </tr>
+                </thead>
+                    <tbdody>";
+        foreach ($table as $row) {
+            echo "<tr>";
+            echo "<td>" . $row['cnpj'] . "</td>";
+            echo "<td>" . $row['nome'] . "</td>";
+            echo "<td>" . $row['email'] . "</td>";
+            echo "<td>" . $row['data'] . "</td>";
+            echo "<td>" . $row['valor'] . "</td>";
             echo "</tr>";
         }
         echo "</tbody>
