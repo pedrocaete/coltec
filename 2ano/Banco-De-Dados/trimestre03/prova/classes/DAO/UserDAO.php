@@ -42,7 +42,7 @@ class UserDAO
         if ($result) {
             return $result;
         } else {
-            throw new EmptyDatabaseColumnException("Colunas não preenchidas para usuário com CPF " . $cpf);
+            echo "Colunas não preenchidas para usuário com CPF " . $cpf;
         }
     }
 
@@ -56,7 +56,7 @@ class UserDAO
         if ($result) {
             return $result;
         } else {
-            throw new EmptyDatabaseColumnException("Coluna " . $column . " vazia para usuário com CPF " . $cpf);
+            echo "Coluna " . $column . " vazia para usuário com CPF " . $cpf;
         }
     }
 

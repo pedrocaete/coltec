@@ -41,7 +41,7 @@ class EstablishmentDAO
             return $result;
         }
         else {
-            throw new EmptyDatabaseColumnException("Coluna " . $column . " vazia para usuário com CNPJ " . $cnpj );
+            echo "Coluna " . $column . " vazia para usuário com CNPJ " . $cnpj;
         }
     }
 

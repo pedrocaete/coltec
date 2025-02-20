@@ -93,7 +93,7 @@ class PurchaseDAO
         if ($result) {
             return $result;
         } else {
-            throw new EmptyDatabaseColumnException("Coluna " . $column . " vazia para usuário com ID " . $id);
+            echo"Coluna " . $column . " vazia para usuário com ID " . $id;
         }
     }
 
