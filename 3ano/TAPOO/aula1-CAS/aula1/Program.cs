@@ -4,13 +4,9 @@ using System.Numerics;
 Expressao a = 10;
 Expressao b = "b";
 
-Expressao soma = new Soma(a, b);
+Expressao soma = a + b;
+Expressao c = 50;
 
-Console.WriteLine(soma);
+Console.WriteLine(a+c);
 
-Expressao x = "x";
-Expressao y = x*x*x+10;
-Console.WriteLine(y);
 
-Expressao derivada = y.Derivar((Simbolo)x);
-Console.WriteLine(derivada);
