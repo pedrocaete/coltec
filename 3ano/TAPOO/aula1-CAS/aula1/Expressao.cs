@@ -15,7 +15,7 @@ public abstract class Expressao
     public static Expressao operator /(Expressao a, Expressao b) => new Divisao(a, b).Simplificar();
 
     public static implicit operator Expressao(int v) => new Numero(v);
-    public static implicit operator Expressao(string s) => new Simbolo(s);   
+    public static implicit operator Expressao(string s) => new Simbolo(s);
 
 
 }
@@ -44,9 +44,9 @@ public class Simbolo : Expressao
     string simbolo;
     public Simbolo(string s) => this.simbolo = s;
     public override string ToString() => simbolo;
-    public override Expressao Derivar(Simbolo x) => 
-        x.simbolo == simbolo 
-            ? new Numero(1) 
+    public override Expressao Derivar(Simbolo x) =>
+        x.simbolo == simbolo
+            ? new Numero(1)
             : new Numero(0);
     public override Expressao Simplificar() => this;
     public override Expressao Substituir(Simbolo x, Expressao e) => this;
@@ -61,14 +61,24 @@ public class Soma : Expressao
         this.b = y;
     }
     public override string ToString() => $"({a.ToString()} + {b.ToString()})";
-    public override Expressao Derivar(Simbolo x) => 
+    public override Expressao Derivar(Simbolo x) =>
         new Soma(a.Derivar(x), b.Derivar(x));
-    public override Expressao Simplificar(){
-       if(a is Numero && b is Numero)
-       {
-          return new Numero((a as Numero).valor + (b as Numero).valor);
-       }
-       return this;
+    public override Expressao Simplificar()
+    {
+        if (a is Numero && b is Numero)
+        {
+            return new Numero((a as Numero).valor + (b as Numero).valor);
+        }
+        if (a == 0)
+        {
+            return b;
+        }
+        if (b == 0)
+        {
+            return a;
+        }
+
+        return this;
     }
     public override Expressao Substituir(Simbolo x, Expressao e)
     {
@@ -88,13 +98,21 @@ public class Subtracao : Expressao
         this.b = y;
     }
     public override string ToString() => $"({a.ToString()} - {b.ToString()})";
-    public override Expressao Derivar(Simbolo x) => 
+    public override Expressao Derivar(Simbolo x) =>
         new Subtracao(a.Derivar(x), b.Derivar(x));
     public override Expressao Simplificar()
     {
-        if(a is Numero && b is Numero)
+        if (a is Numero && b is Numero)
         {
             return new Numero((a as Numero).valor - (b as Numero).valor);
+        }
+        if(a == 0)
+        {
+            return -b;
+        }
+        if (b == 0)
+        {
+            return a;
         }
         return this;
     }
@@ -126,6 +144,10 @@ public class Multiplicacao : Expressao
         {
             return new Numero((a as Numero).valor * (b as Numero).valor);
         }
+        if (a == 0 || b == 0)
+        {
+            return 0;
+        }
         return this;
     }
     public override Expressao Substituir(Simbolo x, Expressao e)
@@ -149,11 +171,23 @@ public class Divisao : Expressao
     public override Expressao Derivar(Simbolo x) =>
         new Divisao(
             new Subtracao(
-                new Multiplicacao(a.Derivar(x), b), 
+                new Multiplicacao(a.Derivar(x), b),
                 new Multiplicacao(a, b.Derivar(x))),
             new Multiplicacao(b, b));
     public override Expressao Simplificar()
     {
+        if(a is Numero && b is Numero)
+        {
+            return new Numero((a as Numero).valor / (b as Numero).valor);
+        }
+        if(a == 0)
+        {
+            return 0;
+        }
+        if(b == 1)
+        {
+            return a;
+        }
         return this;
     }
     public override Expressao Substituir(Simbolo x, Expressao e)
