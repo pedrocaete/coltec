@@ -49,7 +49,8 @@ public class Simbolo : Expressao
             ? new Numero(1)
             : new Numero(0);
     public override Expressao Simplificar() => this;
-    public override Expressao Substituir(Simbolo x, Expressao e) => this;
+    public override Expressao Substituir(Simbolo x, Expressao e) =>
+        x.simbolo == this.simbolo ? e : this;
 }
 
 public class Soma : Expressao
