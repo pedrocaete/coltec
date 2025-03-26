@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ConversorDeUnidadesDeMedida.ViewModels"
+        x:Class="ConversorDeUnidadesDeMedida.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="Conversor de Unidades de Medida">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*">
+        <!-- ListBox para seleção do tipo de conversão -->
+        <TextBlock Text="Selecione o tipo de conversão:" Grid.Row="0" Grid.Column="0" Margin="10"/>
+        <ListBox ItemsSource="{Binding ConversionTypes}" SelectedItem="{Binding SelectedConversionType}" 
+                 Grid.Row="0" Grid.Column="1" Margin="10" Height="100">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Campo de entrada para o valor de origem -->
+        <TextBlock Text="Valor de entrada:" Grid.Row="1" Grid.Column="0" Margin="10"/>
+        <TextBox Text="{Binding InputValue}" Grid.Row="1" Grid.Column="1" Margin="10"/>
+
+        <!-- Campo de saída para o valor convertido -->
+        <TextBlock Text="Valor convertido:" Grid.Row="2" Grid.Column="0" Margin="10"/>
+        <TextBox Text="{Binding OutputValue}" Grid.Row="2" Grid.Column="1" Margin="10" IsReadOnly="True"/>
+
+        <!-- Botão para executar a conversão -->
+        <Button Content="Converter" Command="{Binding ConvertCommand}" Grid.Row="3" Grid.Column="1" Margin="10" HorizontalAlignment="Right"/>
+    </Grid>
+</Window>
