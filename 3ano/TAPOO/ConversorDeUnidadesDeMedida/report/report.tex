@@ -21,6 +21,7 @@
 \usepackage[brazilian,hyperpageref]{backref}	 % Paginas com as citações na bibl
 \usepackage[alf]{abntex2cite}	% Citações padrão ABNT
 \usepackage{listings}
+\usepackage{float}
 
 \lstset{language=Java,
   showspaces=false,
@@ -202,26 +203,142 @@ Grid.Column="1" Margin="10" IsReadOnly="True"/>
 <Button Content="Converter" Command="{Binding ConvertCommand}" Grid.Row="3"
 Grid.Column="1" Margin="10" HorizontalAlignment="Right"/>
 \end{verbatim}
-Observa-se principalmente a Palavra \textit{Binding} dentro de chaves. Isso ocorre para chamar elementos da divisão ViewModel, que serão conectados automaticamente a elas, como ConvertCommand e Name. Essa funcionalidade do Avalonia é extremamente útil para separar as lógicas de View e backend.
+Observa-se principalmente a palavra \textit{Binding} dentro de chaves. Isso ocorre para chamar elementos da divisão ViewModel, que serão conectados automaticamente a elas, como ConvertCommand e Name. Essa funcionalidade do Avalonia é extremamente útil para separar as lógicas de View e backend.
 
 \subsection{ViewModel}
 
+Nesta parte são geradas as propriedades que são utilizadas na View a partir da chamada do comando Binding, além da definição final da função de conversão para utilização pelo programa. A seguir parte do código de definição das propriedades. Perceba que a grande característica é a mudança no set, para além de ele mudar o valor da propriedade \textit{\_nomeDaPropriedade = value} chamar o evento OnPropertyChanged
+
+\begin{verbatim}
+public ObservableCollection<ConversionType> ConversionTypes { get; }
+private ConversionType _selectedConversionType = null!;
+public ConversionType SelectedConversionType
+{
+    get => _selectedConversionType;
+    set
+    {
+        _selectedConversionType = value;
+        OnPropertyChanged();
+    }
+}
+
+private string _inputValue = string.Empty;
+public string InputValue
+{
+    get => _inputValue;
+    set
+    {
+        _inputValue = value;
+        OnPropertyChanged();
+    }
+}
+
+[...]
+\end{verbatim}
+
+O evento OnPropertyChanged é definido nas linhas abaixo, a partir de convenções padrão para mudanças de propriedade quando utilizado o binding. Ele notifica quando uma propriedade foi alterada, passando seu nome, para a interface atualizá-la.
+
+\begin{verbatim}
+public event PropertyChangedEventHandler? PropertyChanged;
+
+protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+{
+    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+}
+\end{verbatim}
+
+A primeira linha define o evento nomeado PropertyChanged, que pode ser null pelo ? antes de seu nome, do tipo PropertyChangedEventHandler.
+
+A função abaixo define o evento, que tem [CallerMemberName], um atributo mágico que passsa automaticamente o nome da propriedade que chamou o evento, caso não for obtido será null, de acordo com o final da linha. Dentro da função se PropertyChanged tiver algum inscrito (verificado por ?) o evento é disparado passando o objeto que disparou o evento e um objeto que descreve qual propriedade mudou.
+
+Após a definição das propriedades, com o evento que dispara quando são alteradas, é feito o construtor da classe:
+
+\begin{verbatim}
+public MainWindowViewModel()
+{
+    ConversionTypes = new ObservableCollection<ConversionType>(ConversionService.GetConversionTypes());
+    ConvertCommand = new RelayCommand(ExecuteConversion);
+}
+\end{verbatim}
+
+É  criada uma ObservableCollection, a qual é uma Collection notifica quando é alterada. Ela armazena os tipos de conversão criados pelo ConversionService. Após isso é criado um comando para a conversão. Ele recebe um objeto RelayComman(ExecuteConversion).
+
+RelayCommand permite que componentes da UI possam executar comandos e verificar que estão disponíveis. Ela recebe o comando que será chamado, se ele está disponível para ser executado, se ele está habilitado ou não segundo os eventos que ele chama e executa o comando passado no construtor. No caso do código, o comando sempre está disponível para ser executado, pois CanExecute sempre retorna true, e ficará sempre habilitado, pois CanExecuteChanged está vazio.
+
+ExecuteConversion executa a conversão
+
+\begin{verbatim}
+private void ExecuteConversion()
+{
+    if (double.TryParse(InputValue, out double input) && SelectedConversionType != null)
+    {
+        OutputValue = SelectedConversionType.ConversionFormula(input).ToString("F2");
+    }
+    else
+    {
+        OutputValue = "Entrada inválida";
+    }
+}
+
+[...]
+
+public class RelayCommand : ICommand
+{
+    private readonly Action _execute;
+
+    public RelayCommand(Action execute)
+    {
+        _execute = execute;
+    }
+
+    public event EventHandler? CanExecuteChanged
+    {
+        add { }
+        remove { }
+    }
+
+    public bool CanExecute(object? parameter) => true;
+
+    public void Execute(object? parameter) => _execute();
+}
+\end{verbatim}
 
 \section{Resultados}
 
-Todos os resultados foram alcançados perfeitamente, com a única ressalva de aparentemente o método Dump permitir a exibição de máximas 16 linhas de toda a seleção.
 
-
-
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{img1.png}
-    \caption{Resultado do Exércicio 10}
+    \includegraphics[width=0.7\textwidth]{imgs/img1.png}
+    \caption{Tela Inicial}
     \label{fig:img1}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{imgs/img2.png}
+    \caption{Seleção da conversão e digitação do valor}
+    \label{fig:img2}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{imgs/img3.png}
+    \caption{Resultado da Conversão}
+    \label{fig:img3}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{imgs/img4.png}
+    \caption{Quilometros para milhas}
+    \label{fig:img4}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{imgs/img5.png}
+    \caption{Galões para Litro}
+    \label{fig:img5}
 \end{figure}
 
 \section{Conclusão}
 
-Todos os objetivos foram alcançados com sucesso. Os maiores problemas foram o método Dump não exibir mais de 16 linhas e a necessidade do uso do simbólo ? após alguns valores para permitir valores \textit{null}, e ?? para manipular um valor que será utilizado quando algum for \textit{null}. Outra observação é que o uso de LINQ lembra enormemente ao SQL.
+Todos os resultados foram alcançados, e foi adquirido um essencial conhecimento sobre padrões recomendados em C\#, como fazer construção de aplicações a partir do modelo MVVM e do uso do Avalonia UI
 
 \end{document}
