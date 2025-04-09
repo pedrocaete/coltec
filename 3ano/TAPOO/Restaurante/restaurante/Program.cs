@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
-using System.Text;
 
-BlockingCollection<(int pedido, int prato)> pedidos = new BlockingCollection<(int pedido, int prato)>();
+BlockingCollection<(int pedidoId, int pratoId)> pedidos = new BlockingCollection<(int pedidoId, int pratoId)>();
 object lockConsole = new();
 
 void ConsoleLock(string msg, ConsoleColor color)
 {
-    lock(lockConsole)
+    lock (lockConsole)
     {
         var aux = Console.ForegroundColor;
         Console.ForegroundColor = color;
@@ -16,47 +15,56 @@ void ConsoleLock(string msg, ConsoleColor color)
         Console.ForegroundColor = aux;
     }
 }
-int pedido = 0;
+
+int proximoPedidoId = 0;
+
 void Garcom()
 {
     var rnd = new Random();
-    var id = Thread.CurrentThread.ManagedThreadId;
-    Console.WriteLine($"[Garcom {id}] Estou pronto!!!");
-    while(true)
+    var threadId = Thread.CurrentThread.ManagedThreadId;
+    Console.WriteLine($"[Garcom {threadId}] Estou pronto!!!");
+
+    while (true)
     {
         int tempo = rnd.Next(1000, 10000);
-        int prato = rnd.Next(1, 4);
-        int p = Interlocked.Increment(ref pedido);
+        int pratoId = rnd.Next(1, 4);
+        int pedidoId = Interlocked.Increment(ref proximoPedidoId);
 
         Thread.Sleep(tempo);
 
-        ConsoleLock($"[Garcom {id}] Enviei pedido {p} do prato {prato}!", ConsoleColor.Blue);
-        pedidos.Add((p, prato));
-        pedido++;
+        ConsoleLock($"[Garcom {threadId}] Enviei pedido {pedidoId} do prato {pratoId}!", ConsoleColor.Blue);
+        pedidos.Add((pedidoId, pratoId));
     }
+
     pedidos.CompleteAdding();
 }
 
 void Chef()
 {
     Console.WriteLine("[Chef] Estou pronto!!!");
-    foreach(var item in pedidos.GetConsumingEnumerable())
-    {
-        var (pedido, prato) = item;
-        ConsoleLock($"[Chef] Iniciando o pedido {pedido} do prato {prato}!", ConsoleColor.Red);
 
-        if(prato is 1 or 2) Thread.Sleep(2000);
+    foreach (var (pedidoId, pratoId) in pedidos.GetConsumingEnumerable())
+    {
+        ConsoleLock($"[Chef] Iniciando o pedido {pedidoId} do prato {pratoId}!", ConsoleColor.Red);
+
+        if (pratoId is 1 or 2) Thread.Sleep(2000);
         else Thread.Sleep(3000);
 
-        ConsoleLock($"[Chef] Finalizado o pedido {pedido} do prato {prato}!", ConsoleColor.Red);
+        ConsoleLock($"[Chef] Finalizado o pedido {pedidoId} do prato {pratoId}!", ConsoleColor.Red);
     }
 }
 
+// Inicializa 5 garçons (tasks)
+var tarefasGarcons = Enumerable.Range(1, 5)
+    .Select(_ => Task.Run(() => Garcom()))
+    .ToList();
 
-var g = Enumerable .Range(1, 5).Select(i => Task.Run(() => Garcom())).ToList();
-var c = new Task(Chef);
+// Inicializa o chef (task)
+var tarefaChef = new Task(Chef);
+tarefaChef.Start();
 
-c.Start();
+// Aguarda o término do chef (nunca ocorre neste caso)
+tarefaChef.Wait();
 
-c.Wait();
-Task.WaitAll(g);
+// Aguarda o término de todos os garçons (também nunca ocorre)
+Task.WaitAll(tarefasGarcons.ToArray());
