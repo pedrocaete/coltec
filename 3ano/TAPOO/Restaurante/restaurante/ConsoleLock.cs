@@ -2,7 +2,7 @@ public static class ConsoleLock
 {
     private static readonly object _lock = new();
 
-    public static void Log(ConsoleLock color, string message)
+    public static void Log(ConsoleColor color, string message)
     {
         lock (_lock)
         {

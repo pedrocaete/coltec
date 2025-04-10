@@ -1,3 +1,6 @@
+using System.Threading;
+using System.Collections.Concurrent;
+
 public class Chef
 {
     private readonly BlockingCollection<Order> _ordersqueue;
@@ -6,17 +9,23 @@ public class Chef
 
     public Chef(string name, BlockingCollection<Order> ordersqueue, IngredientsStock stock)
     {
-        _nome = name;
-        _filaPedidos = ordersqueue;
+        _name = name;
+        _ordersqueue = ordersqueue;
         _stock = stock;
     }
 
-    private int PrepareIngredient(Ingredient ingredient)
+    private void PrepareIngredient(Ingredient ingredient)
     {
-        switch(ingredient){
-            case Ingredient.Arroz:
+        Thread.Sleep(ingredient.PreparationTime);
+        _stock.AddIngredient(ingredient, ingredient.PortionsByPreparation);
+    }
 
-            case ingredient.
+    private void prepareOrder(Order order){
+        int timeToPrepare = 0;
+        foreach(var item in order.Dish.Ingredients)
+        {
+            timeToPrepare += 1000 * item.Value;
         }
+        Thread.Sleep(timeToPrepare);
     }
 }

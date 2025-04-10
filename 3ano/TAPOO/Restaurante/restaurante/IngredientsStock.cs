@@ -35,17 +35,27 @@ public class IngredientsStock
         return true;
     }
 
-    public void ConsumeIngredient(TypeDish dish)
+    public Dictionary<Ingredient, int> ConsumeIngredient(TypeDish dish)
     {
+        var missing = new Dictionary<Ingredient, int>;
         foreach (var item in GetOrderedIngredients(dish))
         {
             lock (_locks[item.Key])
             {
-                Stock[item.Key] -= item.Value;
+                if (Stock[item.Key] < item.Value)
+                {
+                    missing[item.Key] = Stock[item.Key] - item.Value;
+                }
+                else
+                {
+                    Stock[item.Key] -= item.Value;
+                }
             }
         }
+        return missing;
     }
-    public void AddIngredient(Ingredients ingredient, int amount)
+
+    public void AddIngredient(Ingredient ingredient, int amount)
     {
         lock (_locks[ingredient])
         {
@@ -55,6 +65,6 @@ public class IngredientsStock
 
     private IEnumerable<KeyValuePair<Ingredient, int>> GetOrderedIngredients(TypeDish dish)
     {
-        return dish.Ingredients.OrderBy(in => (int)i.Key);
+        return dish.Ingredients.OrderBy(i => (int)i.Key.Order);
     }
 }

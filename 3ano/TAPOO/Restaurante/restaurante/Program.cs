@@ -5,17 +5,6 @@ using System.Collections.Concurrent;
 BlockingCollection<(int pedidoId, int pratoId)> pedidos = new BlockingCollection<(int pedidoId, int pratoId)>();
 object lockConsole = new();
 
-void ConsoleLock(string msg, ConsoleColor color)
-{
-    lock (lockConsole)
-    {
-        var aux = Console.ForegroundColor;
-        Console.ForegroundColor = color;
-        Console.WriteLine(msg);
-        Console.ForegroundColor = aux;
-    }
-}
-
 int proximoPedidoId = 0;
 
 void Garcom()
