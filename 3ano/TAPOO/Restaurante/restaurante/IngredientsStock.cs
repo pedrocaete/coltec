@@ -23,32 +23,31 @@ public class IngredientsStock
 
     public bool HasSuficientStock(TypeDish dish)
     {
-        foreach (var item in GetOrderedIngredients(dish))
+        foreach (var (ingredient, quantity) in GetOrderedIngredients(dish))
         {
-            lock (_locks[item.Key])
+            lock (_locks[ingredient])
             {
-                if (Stock[item.Key] < item.Value)
+                if (Stock[ingredient] < quantity)
                     return false;
             }
-
         }
         return true;
     }
 
     public Dictionary<Ingredient, int> ConsumeIngredient(TypeDish dish)
     {
-        var missing = new Dictionary<Ingredient, int>;
-        foreach (var item in GetOrderedIngredients(dish))
+        var missing = new Dictionary<Ingredient, int>();
+        foreach (var (ingredient, quantity) in GetOrderedIngredients(dish))
         {
-            lock (_locks[item.Key])
+            lock (_locks[ingredient])
             {
-                if (Stock[item.Key] < item.Value)
+                if (Stock[ingredient] < quantity)
                 {
-                    missing[item.Key] = Stock[item.Key] - item.Value;
+                    missing[ingredient] = quantity - Stock[ingredient];
                 }
                 else
                 {
-                    Stock[item.Key] -= item.Value;
+                    Stock[ingredient] -= quantity;
                 }
             }
         }

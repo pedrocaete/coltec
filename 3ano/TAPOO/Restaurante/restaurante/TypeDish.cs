@@ -34,6 +34,13 @@ public class TypeDish
                 {Ingredient.Molho, 1}
             });
 
+    public static readonly List<TypeDish> All = new()
+    {
+        Executive,
+        Italian,
+        Special,
+    };
+
     public static TypeDish? FromName(string name)
     {
         _types.TryGetValue(name, out var type);

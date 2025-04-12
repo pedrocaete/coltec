@@ -2,58 +2,31 @@
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 
-BlockingCollection<(int pedidoId, int pratoId)> pedidos = new BlockingCollection<(int pedidoId, int pratoId)>();
-object lockConsole = new();
-
-int proximoPedidoId = 0;
-
-void Garcom()
+class Program
 {
-    var rnd = new Random();
-    var threadId = Thread.CurrentThread.ManagedThreadId;
-    Console.WriteLine($"[Garcom {threadId}] Estou pronto!!!");
-
-    while (true)
+    static void Main(string[] args)
     {
-        int tempo = rnd.Next(1000, 10000);
-        int pratoId = rnd.Next(1, 4);
-        int pedidoId = Interlocked.Increment(ref proximoPedidoId);
+        BlockingCollection<Order> ordersQueue = new();
+        IngredientsStock stock = new();
+        
+        List<string> chefNames = new(){"Quaresma", "Reinaldo", "Jorge"};
+        List<string> waiterNames = new(){"Rodrigo", "Sergio", "Alemão", "Mafeus", "LP"};
 
-        Thread.Sleep(tempo);
+        Chef[] chefs = new Chef[3];
+        Waiter[] waiters = new Waiter[5];
 
-        ConsoleLock($"[Garcom {threadId}] Enviei pedido {pedidoId} do prato {pratoId}!", ConsoleColor.Blue);
-        pedidos.Add((pedidoId, pratoId));
-    }
+        for (int i = 0; i < 5; i++)
+        {
+            waiters[i] = new Waiter(waiterNames[i], ordersQueue);
+            waiters[i].Start();
+        }
 
-    pedidos.CompleteAdding();
-}
+        for (int i = 0; i < 3; i++)
+        {
+            chefs[i] = new Chef(chefNames[i], ordersQueue, stock);
+            chefs[i].Start();
+        }
 
-void Chef()
-{
-    Console.WriteLine("[Chef] Estou pronto!!!");
-
-    foreach (var (pedidoId, pratoId) in pedidos.GetConsumingEnumerable())
-    {
-        ConsoleLock($"[Chef] Iniciando o pedido {pedidoId} do prato {pratoId}!", ConsoleColor.Red);
-
-        if (pratoId is 1 or 2) Thread.Sleep(2000);
-        else Thread.Sleep(3000);
-
-        ConsoleLock($"[Chef] Finalizado o pedido {pedidoId} do prato {pratoId}!", ConsoleColor.Red);
+        Console.ReadLine();
     }
 }
-
-// Inicializa 5 garçons (tasks)
-var tarefasGarcons = Enumerable.Range(1, 5)
-    .Select(_ => Task.Run(() => Garcom()))
-    .ToList();
-
-// Inicializa o chef (task)
-var tarefaChef = new Task(Chef);
-tarefaChef.Start();
-
-// Aguarda o término do chef (nunca ocorre neste caso)
-tarefaChef.Wait();
-
-// Aguarda o término de todos os garçons (também nunca ocorre)
-Task.WaitAll(tarefasGarcons.ToArray());
