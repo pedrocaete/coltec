@@ -4,9 +4,10 @@ using System.Threading.Tasks;
 public class Philosopher
 {
     private static int _nextId = 0;
-    public static int TotalForks{ get; set; }
     private static object _lock = new();
     private SemaphoreSlim Semaphore;
+    private Table? _table;
+    public int numberOfEatings = 0;
 
     public string Name { get; }
     public string Thought { get; set; }
@@ -14,33 +15,38 @@ public class Philosopher
     public int Id { get; }
 
 
-    public Philosopher(string name, string thought, int totalForks, SemaphoreSlim semaphore)
+    public Philosopher(string name, string thought, SemaphoreSlim semaphore)
     {
         Name = name;
         Thought = thought;
-        TotalForks = totalForks;
+        Forks = 1;
         Id = Interlocked.Increment(ref _nextId);
         Semaphore = semaphore;
     }
 
+    public void SetTable(Table table)
+    {
+        _table = table;
+    }
+
     public void Start()
     {
-        Task.Run(async() =>
+        Task.Run(() =>
         {
-            while(true)
+            while (true)
             {
                 try
                 {
                     Live();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     ConsoleLock.Log(ConsoleColor.DarkRed, $"[{Name}] - ERRO: {e.Message}");
                 }
             }
         });
 
-        
+
     }
 
     public void Live()
@@ -48,6 +54,8 @@ public class Philosopher
         if (Forks < 2)
         {
             Think();
+            Semaphore.Wait();
+            GetFork();
         }
         else
         {
@@ -55,44 +63,39 @@ public class Philosopher
         }
     }
 
-    public async void Think()
+    public void Think()
     {
-        ConsoleLock.Log(ConsoleColor.DarkBlue, $"Filosofo { Name } está pensando:{ Thought }");
-        Thread.Sleep(3000);
-        await Semaphore.WaitAsync();
-        GetFork();
+        ConsoleLock.Log(ConsoleColor.DarkBlue, $"Filosofo {Name} está pensando:{Thought}");
+        Thread.Sleep(400);
     }
-    
+
     public void Eat()
     {
-        ConsoleLock.Log(ConsoleColor.Green, $"Filosofo { Name } está comendo");
-        Thread.Sleep(3000);
-        lock (_lock)
+        if (Forks < 2)
         {
-            TotalForks += Forks;
-            ConsoleLock.Log(ConsoleColor.Yellow, $"Filosofo { Name } devolveu { Forks } garfos. Garfos na mesa agora: { TotalForks }");
-            Forks = 0;
+            return;
         }
+
+        ConsoleLock.Log(ConsoleColor.Green, $"Filosofo {Name} está comendo");
+        numberOfEatings ++;
+        Thread.Sleep(400);
         Semaphore.Release();
     }
 
     public void GetFork()
     {
-        ConsoleLock.Log(ConsoleColor.DarkYellow, $"Filosofo { Name } está com { Forks } garfos");
-        while(Forks < 2)
+        var leftPhilosopher = _table?.GetLeftPhiloshoper(Id);
+        var rightPhilosopher = _table?.GetRightPhiloshoper(Id);
+        if (leftPhilosopher?.Forks >= 1 && Forks < 2)
         {
-            lock(_lock)
-            {
-                if(TotalForks > 0)
-                {
-                    Forks ++;
-                    TotalForks --;
-                    ConsoleLock.Log(ConsoleColor.DarkYellow, $"Filosofo { Name } está com { Forks } garfos");
-                    Thread.Sleep(2000);
-                }
-            }
+            leftPhilosopher.Forks--;
+            Forks++;
         }
-        Eat();
+        if (rightPhilosopher?.Forks >= 1 && Forks < 2)
+        {
+            rightPhilosopher.Forks--;
+            Forks++;
+        }
+        ConsoleLock.Log(ConsoleColor.DarkYellow, $"Filosofo {Name} está com {Forks} garfos");
     }
-
 }

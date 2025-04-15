@@ -6,28 +6,26 @@ class Program
     static void Main(string[] args)
     {
         SemaphoreSlim semaphore = new SemaphoreSlim(3);
-        Philosopher[] philosophers = new Philosopher[5]; 
-        int totalForks = philosophers.Length;
-        List<string> names = new(){
-            "Tonhão",
-            "Raiam Santos",
-            "Lula",
-            "Ryan SP",
-            "MC Nego",
-        };
-        List<string> thoughts = new(){
-            "A placa tectônica não tá nem aí pra se a menina é virgem",
-            "Tem gente que paga pra ver mulher feia pelada",
-            "Se tá caro não compra",
-            "Nós come bosta",
-            "Toma que toma que toma",
-        };
-        for (int i = 0; i < philosophers.Length; i++)
+        Table table = new Table(semaphore);
+        for (int i = 0; i < table.Philosophers.Length; i++)
         {
-            philosophers[i] = new Philosopher(names[i], thoughts[i], totalForks, semaphore);
-            philosophers[i].Start();
+            table.Philosophers[i].Start(); // ✅ Correto agora!
         }
-        Console.ReadLine();
+        Thread.Sleep(10000);
+
+
+        ConsoleLock.Log(ConsoleColor.Black,"Número de garfos de cada filósofo após 10 segundos:");
+        for (int i = 0; i < table.Philosophers.Length; i++)
+        {
+            ConsoleLock.Log(ConsoleColor.DarkGreen,$"{table.Philosophers[i].Name}: {table.Philosophers[i].Forks}");
+        }
+        ConsoleLock.Log(ConsoleColor.Black,"Número de refeições de cada filósofo após 10 segundos:");
+        for (int i = 0; i < table.Philosophers.Length; i++)
+        {
+            ConsoleLock.Log(ConsoleColor.DarkGreen, $"{table.Philosophers[i].Name}: {table.Philosophers[i].numberOfEatings} refeições");
+        }
+        ConsoleLock.Log(ConsoleColor.Black,"Tempo esgotado! Finalizando o programa...");
+        Environment.Exit(0); // Encerra o programa
     }
 }
 
