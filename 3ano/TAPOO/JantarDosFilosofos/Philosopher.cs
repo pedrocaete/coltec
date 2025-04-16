@@ -3,30 +3,23 @@ using System.Threading.Tasks;
 
 public class Philosopher
 {
+    const int NUMBER_OF_PHILOSOPHERS = 5;
     private static int _nextId = 0;
     private static object _lock = new();
-    private SemaphoreSlim Semaphore;
-    private Table? _table;
+    private SemaphoreSlim[] Forks;
     public int numberOfEatings = 0;
 
     public string Name { get; }
     public string Thought { get; set; }
-    public int Forks { get; set; }
     public int Id { get; }
 
 
-    public Philosopher(string name, string thought, SemaphoreSlim semaphore)
+    public Philosopher(string name, string thought, SemaphoreSlim[] forks)
     {
         Name = name;
         Thought = thought;
-        Forks = 1;
         Id = Interlocked.Increment(ref _nextId);
-        Semaphore = semaphore;
-    }
-
-    public void SetTable(Table table)
-    {
-        _table = table;
+        Forks = forks;
     }
 
     public void Start()
@@ -51,51 +44,54 @@ public class Philosopher
 
     public void Live()
     {
-        if (Forks < 2)
-        {
-            Think();
-            Semaphore.Wait();
-            GetFork();
-        }
-        else
-        {
-            Eat();
-        }
+        Think();
+        Eat();
     }
 
     public void Think()
     {
         ConsoleLock.Log(ConsoleColor.DarkBlue, $"Filosofo {Name} está pensando:{Thought}");
-        Thread.Sleep(400);
+        Thread.Sleep(100);
     }
 
     public void Eat()
     {
-        if (Forks < 2)
-        {
-            return;
-        }
-
+        GetFork();
         ConsoleLock.Log(ConsoleColor.Green, $"Filosofo {Name} está comendo");
-        numberOfEatings ++;
-        Thread.Sleep(400);
-        Semaphore.Release();
+        numberOfEatings++;
+        Thread.Sleep(100);
+        ReleaseForks();
     }
 
     public void GetFork()
     {
-        var leftPhilosopher = _table?.GetLeftPhiloshoper(Id);
-        var rightPhilosopher = _table?.GetRightPhiloshoper(Id);
-        if (leftPhilosopher?.Forks >= 1 && Forks < 2)
+        var leftFork = getLeftFork();
+        var rightFork = getRightFork();
+        if (leftFork > rightFork)
         {
-            leftPhilosopher.Forks--;
-            Forks++;
+            var temp = leftFork;
+            leftFork = rightFork;
+            rightFork = temp;
         }
-        if (rightPhilosopher?.Forks >= 1 && Forks < 2)
-        {
-            rightPhilosopher.Forks--;
-            Forks++;
-        }
-        ConsoleLock.Log(ConsoleColor.DarkYellow, $"Filosofo {Name} está com {Forks} garfos");
+        Forks[leftFork].Wait();
+        Forks[rightFork].Wait();
+    }
+
+    public void ReleaseForks()
+    {
+        var leftFork = getLeftFork();
+        var rightFork = getRightFork();
+        Forks[leftFork].Release();
+        Forks[rightFork].Release();
+    }
+
+    public int getLeftFork()
+    {
+        return (Id - 1 + NUMBER_OF_PHILOSOPHERS) % NUMBER_OF_PHILOSOPHERS;
+    }
+
+    public int getRightFork()
+    {
+        return (Id + 1) % NUMBER_OF_PHILOSOPHERS;
     }
 }
