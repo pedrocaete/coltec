@@ -1,6 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
-
 public class Philosopher
 {
     const int NUMBER_OF_PHILOSOPHERS = 5;
@@ -51,7 +48,7 @@ public class Philosopher
     public void Think()
     {
         ConsoleLock.Log(ConsoleColor.DarkBlue, $"Filosofo {Name} está pensando:{Thought}");
-        Thread.Sleep(100);
+        Thread.Sleep(500);
     }
 
     public void Eat()
@@ -59,7 +56,7 @@ public class Philosopher
         GetFork();
         ConsoleLock.Log(ConsoleColor.Green, $"Filosofo {Name} está comendo");
         numberOfEatings++;
-        Thread.Sleep(100);
+        Thread.Sleep(500);
         ReleaseForks();
     }
 

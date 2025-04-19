@@ -8,15 +8,15 @@ class Program
         SemaphoreSlim[] forks = new SemaphoreSlim[5];
         Philosopher[] philosophers = new Philosopher[5];
         List<string> names = new(){
-             "Tonhão",
-             "Raiam Santos",
+             "Descartes",
+             "Socrátes",
              "Lula",
              "Ryan SP",
              "MC Nego",
          };
         List<string> thoughts = new(){
-             "A placa tectônica não tá nem aí pra se a menina é virgem",
-             "Tem gente que paga pra ver mulher feia pelada",
+             "Penso logo, existo",
+             "Só sei que estou com fome",
              "Se tá caro não compra",
              "Nós come bosta",
              "Toma que toma que toma",
@@ -34,12 +34,12 @@ class Program
 
         Thread.Sleep(10_000);
 
-        ConsoleLock.Log(ConsoleColor.Black, "Número de refeições de cada filósofo após 10 segundos:");
+        ConsoleLock.Log(ConsoleColor.Red, "Número de refeições de cada filósofo após 10 segundos:");
         for (int i = 0; i < philosophers.Length; i++)
         {
             ConsoleLock.Log(ConsoleColor.DarkGreen, $"{philosophers[i].Name}: {philosophers[i].numberOfEatings} refeições");
         }
-        ConsoleLock.Log(ConsoleColor.Black, "Tempo esgotado! Finalizando o programa...");
+        ConsoleLock.Log(ConsoleColor.Red, "Tempo esgotado! Finalizando o programa...");
         Environment.Exit(0); // Encerra o programa
     }
 }
