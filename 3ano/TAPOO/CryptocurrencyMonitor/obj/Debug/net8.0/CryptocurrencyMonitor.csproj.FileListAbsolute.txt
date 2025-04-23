@@ -1,0 +1,14 @@
+/home/a2023951431/CryptocurrencyMonitor/obj/Debug/net8.0/CryptocurrencyMonitor.GeneratedMSBuildEditorConfig.editorconfig
+/home/a2023951431/CryptocurrencyMonitor/obj/Debug/net8.0/CryptocurrencyMonitor.AssemblyInfoInputs.cache
+/home/a2023951431/CryptocurrencyMonitor/obj/Debug/net8.0/CryptocurrencyMonitor.AssemblyInfo.cs
+/home/a2023951431/CryptocurrencyMonitor/obj/Debug/net8.0/CryptocurrencyMonitor.csproj.CoreCompileInputs.cache
+/home/a2023951431/CryptocurrencyMonitor/bin/Debug/net8.0/CryptocurrencyMonitor
+/home/a2023951431/CryptocurrencyMonitor/bin/Debug/net8.0/CryptocurrencyMonitor.deps.json
+/home/a2023951431/CryptocurrencyMonitor/bin/Debug/net8.0/CryptocurrencyMonitor.runtimeconfig.json
+/home/a2023951431/CryptocurrencyMonitor/bin/Debug/net8.0/CryptocurrencyMonitor.dll
+/home/a2023951431/CryptocurrencyMonitor/bin/Debug/net8.0/CryptocurrencyMonitor.pdb
+/home/a2023951431/CryptocurrencyMonitor/obj/Debug/net8.0/CryptocurrencyMonitor.dll
+/home/a2023951431/CryptocurrencyMonitor/obj/Debug/net8.0/refint/CryptocurrencyMonitor.dll
+/home/a2023951431/CryptocurrencyMonitor/obj/Debug/net8.0/CryptocurrencyMonitor.pdb
+/home/a2023951431/CryptocurrencyMonitor/obj/Debug/net8.0/CryptocurrencyMonitor.genruntimeconfig.cache
+/home/a2023951431/CryptocurrencyMonitor/obj/Debug/net8.0/ref/CryptocurrencyMonitor.dll
