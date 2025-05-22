@@ -94,12 +94,9 @@ class Table
             {
                 var mappedCoordinate = MapCoordinate(coordinate);
 
-                foreach (var ship in ships.Take(shipsNumber))
+                if (IsShipPositionRepeated(mappedCoordinate))
                 {
-                    if (IsShipPositionRepeated(mappedCoordinate))
-                    {
-                        throw new ArgumentException("Coordenada repetida");
-                    }
+                    throw new ArgumentException("Coordenada repetida");
                 }
 
                 return mappedCoordinate;
