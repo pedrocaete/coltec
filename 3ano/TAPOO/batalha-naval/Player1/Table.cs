@@ -89,7 +89,6 @@ class Table
     {
         while (true)
         {
-            bool shipIsRepeated = false;
             string coordinate = ReadShipPosition();
             try
             {
@@ -97,17 +96,13 @@ class Table
 
                 foreach (var ship in ships.Take(shipsNumber))
                 {
-                    if (ship.row == mappedCoordinate.row && ship.column == mappedCoordinate.column)
+                    if (IsShipPositionRepeated(mappedCoordinate))
                     {
-                        shipIsRepeated = true;
                         throw new ArgumentException("Coordenada repetida");
                     }
                 }
 
-                if (shipIsRepeated == false)
-                {
-                    return mappedCoordinate;
-                }
+                return mappedCoordinate;
             }
             catch (ArgumentException e)
             {
@@ -155,24 +150,24 @@ class Table
     {
         while (true)
         {
-            bool shipIsRepeated = false;
             int row = rand.Next(0, table.GetLength(0));
             int column = rand.Next(0, table.GetLength(1));
 
-            foreach (var ship in ships.Take(shipsNumber))
-            {
-                if (ship.row == row && ship.column == column)
-                {
-                    shipIsRepeated = true;
-                    break;
-                }
-            }
-
-            if (shipIsRepeated == false)
+            if (!IsShipPositionRepeated((row, column)))
             {
                 return (row, column);
             }
         }
+    }
+
+    bool IsShipPositionRepeated((int row, int column) position)
+    {
+        foreach (var ship in ships.Take(shipsNumber))
+        {
+            if (ship.row == position.row && ship.column == position.column)
+                return true;
+        }
+        return false;
     }
 
 
