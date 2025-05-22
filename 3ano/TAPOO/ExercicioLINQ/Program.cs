@@ -7,6 +7,17 @@ class Program
     static void Main()
     {
         TotalDeGastosPorAno();
+        TotalGastoPorPartido();
+        Top5DeputadosComMaiorGastoIndividual();
+        GastoMedioPorMes();
+        TotalGastoEmAlimentacaoPorDeputado();
+        FornecedoresUtilizadosMaisVezes();
+        FornecedoresComMaiorGasto();
+        GastoTotalPorUF();
+        MesesComMaisDocumentosEmitidos();
+        DeputadosComDespesaAcimaDeDezMil();
+        TotalGastoPorTipoDeDespesa();
+
     }
 
     static void TotalGastoPorPartido()

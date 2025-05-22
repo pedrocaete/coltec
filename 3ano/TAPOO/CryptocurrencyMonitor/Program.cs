@@ -1,8 +1,4 @@
-﻿
-using System.Threading.Tasks;
-
-
-class Program
+﻿class Program
 {
     public static async Task Main(string[] args)
     {
@@ -21,23 +17,27 @@ class Program
 
         using CancellationTokenSource cts = new();
 
-
         _ = MonitorarTeclaEscAsync(cts);
-        while (!cts.Token.IsCancellationRequested)
+        try
         {
-            var tasks = new List<Task>();
-
-            tasks.Add(Task.Run(async () =>
+            while (!cts.Token.IsCancellationRequested)
             {
-                foreach (var crypto in cryptos)
+                var tasks = cryptos.Select(async crypto =>
                 {
                     await crypto.ObterEConverterCotacaoAsync(cts.Token);
                     crypto.ExibirResultadosNoConsole();
-                }
-            }));
-
-            await Task.WhenAll(tasks);
-            await Task.Delay(30000, cts.Token);
+                });
+                await Task.WhenAll(tasks);
+                await Task.Delay(30000, cts.Token);
+            }
+        }
+        catch (TaskCanceledException)
+        {
+            Console.WriteLine("Programa Encerrado");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Ocorreu um erro: {e}");
         }
     }
 

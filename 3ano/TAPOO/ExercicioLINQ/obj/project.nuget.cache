@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "0J5o7XY25lw=",
+  "dgSpecHash": "nvkhNo5KZLk=",
   "success": true,
   "projectFilePath": "/home/pedro/School/3ano/TAPOO/ExercicioLINQ/ExercicioLINQ.csproj",
   "expectedPackageFiles": [
     "/home/pedro/.nuget/packages/consoledump/0.7.0/consoledump.0.7.0.nupkg.sha512",
-    "/home/pedro/.nuget/packages/microsoft.aspnetcore.app.ref/9.0.2/microsoft.aspnetcore.app.ref.9.0.2.nupkg.sha512"
+    "/home/pedro/.nuget/packages/microsoft.aspnetcore.app.ref/9.0.4/microsoft.aspnetcore.app.ref.9.0.4.nupkg.sha512"
   ],
   "logs": []
 }

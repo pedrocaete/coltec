@@ -4,8 +4,9 @@ using System.Text.Json;
 public class Cryptocurrency
 {
     decimal AtualPrice { get; set; }
-    decimal? PreviousPrice { get; set; }
+    decimal PreviousPrice { get; set; }
     string Simbol { get; }
+    bool FirstFetch { get; set;} = true;
 
     public Cryptocurrency(string simbol)
     {
@@ -35,9 +36,9 @@ public class Cryptocurrency
         using var documento = JsonDocument.Parse(json);
         if (documento.RootElement.TryGetProperty(Simbol, out var dadosMoeda))
         {
-            PreviousPrice = PreviousPrice == null ? 0 : AtualPrice;
+            PreviousPrice = AtualPrice;
             var precoString = dadosMoeda.GetProperty("price").GetString();
-            AtualPrice = decimal.Parse(precoString,
+            AtualPrice = decimal.Parse(precoString!,
 CultureInfo.InvariantCulture);
         }
     }
@@ -46,12 +47,13 @@ CultureInfo.InvariantCulture);
     {
         string cotationSimbol;
         var corOriginal = Console.ForegroundColor;
-        if (AtualPrice > PreviousPrice)
+        decimal priceDiff = AtualPrice - PreviousPrice;
+        if (priceDiff >= 0.01m)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             cotationSimbol = "↑";
         }
-        else if (AtualPrice < PreviousPrice)
+        else if (priceDiff <= -0.01m)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             cotationSimbol = "↓";
@@ -61,13 +63,14 @@ CultureInfo.InvariantCulture);
             Console.ForegroundColor = ConsoleColor.White;
             cotationSimbol = "|";
         }
+        if(FirstFetch)
+        {
+            FirstFetch = false;
+            Console.ForegroundColor = ConsoleColor.White;
+            cotationSimbol = "|";
+        }
 
         Console.WriteLine($"{Simbol}: ${AtualPrice:N2} {cotationSimbol}");
         Console.ForegroundColor = corOriginal;
     }
-
-
-
-
-
 }

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "b3jmn1SU93A=",
+  "success": true,
+  "projectFilePath": "/home/pedro/School/3ano/TAPOO/batalha-naval/Player2/Player2.csproj",
+  "expectedPackageFiles": [
+    "/home/pedro/.nuget/packages/microsoft.aspnetcore.app.ref/9.0.4/microsoft.aspnetcore.app.ref.9.0.4.nupkg.sha512"
+  ],
+  "logs": []
+}

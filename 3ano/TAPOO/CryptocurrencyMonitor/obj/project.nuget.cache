@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "3Nd5iR3T06g=",
+  "dgSpecHash": "TGjH1jmgbJ8=",
   "success": true,
-  "projectFilePath": "/home/a2023951431/CryptocurrencyMonitor/CryptocurrencyMonitor.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "/home/pedro/School/3ano/TAPOO/CryptocurrencyMonitor/CryptocurrencyMonitor.csproj",
+  "expectedPackageFiles": [
+    "/home/pedro/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.15/microsoft.aspnetcore.app.ref.8.0.15.nupkg.sha512",
+    "/home/pedro/.nuget/packages/microsoft.netcore.app.host.linux-x64/8.0.15/microsoft.netcore.app.host.linux-x64.8.0.15.nupkg.sha512"
+  ],
   "logs": []
 }
