@@ -21,33 +21,20 @@ class Table
 
     public void Show()
     {
+        MakeTable();
+    }
+
+    void MakeTable()
+    {
+
         for (int i = 0; i < 11; i++)
         {
             for (int j = 0; j < 11; j++)
             {
-                if (i == 0 && j == 0)
-                {
-                    Console.Write("\t");
-                }
-                else if (i == 0)
-                {
-                    char letter = (char)('A' + j - 1);
-                    Console.Write($"{letter} \t");
-                }
-                else if (j == 0)
-                {
-                    Console.Write($"{i} \t");
-                }
-                else
-                {
-                    Console.Write($"{table[i - 1, j - 1]} \t");
-                }
+                MakeTableCompenents(i, j);
             }
-            if (i == 0)
-            {
-                Console.WriteLine();
-            }
-            Console.WriteLine();
+            MakeHeaderLineSpacement(i);
+            MakeLineBreak();
         }
     }
 
@@ -167,5 +154,37 @@ class Table
         return false;
     }
 
+    void MakeHeaderLineSpacement(int row)
+    {
+        if (row == 0)
+        {
+            Console.WriteLine();
+        }
+    }
 
+    void MakeLineBreak()
+    {
+        Console.WriteLine();
+    }
+
+    void MakeTableCompenents(int row, int column)
+    {
+        if (row == 0 && column == 0)
+        {
+            Console.Write("\t");
+        }
+        else if (row == 0)
+        {
+            char letter = (char)('A' + column - 1);
+            Console.Write($"{letter} \t");
+        }
+        else if (column == 0)
+        {
+            Console.Write($"{row} \t");
+        }
+        else
+        {
+            Console.Write($"{table[row - 1, column - 1]} \t");
+        }
+    }
 }

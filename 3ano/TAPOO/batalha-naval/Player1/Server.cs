@@ -1,4 +1,3 @@
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -22,6 +21,7 @@ public class Server
         var data = Encoding.ASCII.GetBytes(msg);
         stream.Write(data, 0, data.Length);
     }
+
     public string Receive()
     {
         var buf = new byte[32];
