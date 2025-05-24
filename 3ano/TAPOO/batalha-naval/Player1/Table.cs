@@ -2,8 +2,13 @@ class Table
 {
     char[,] table = new char[10, 10];
     int shipsNumber = 0;
-    (int row, int column)[] ships = new (int, int)[10];
+    Ship[] ships;
     Random rand = new Random();
+
+    public Table()
+    {
+        ships = new Ship[10];
+    }
 
     public void CreateTableWithRandomShipsPositions()
     {
@@ -33,133 +38,22 @@ class Table
             {
                 MakeTableCompenents(i, j);
             }
-            MakeHeaderLineSpacement(i);
+            if (IsHeader(i))
+            {
+                MakeHeaderLineSpacement();
+            }
             MakeLineBreak();
         }
     }
 
-    void Initialize()
+    bool IsHeader(int row)
     {
-        for (int i = 0; i < 10; i++)
-        {
-            for (int j = 0; j < 10; j++)
-            {
-                table[i, j] = '~';
-            }
-        }
+        return row == 0 ? true : false;
     }
 
-    void AddShipsRandomly()
+    void MakeHeaderLineSpacement()
     {
-        while (shipsNumber < 10)
-        {
-            ships[shipsNumber] = GetRandomShipPosition();
-            var ship = ships[shipsNumber];
-            table[ship.row, ship.column] = '*';
-            shipsNumber++;
-        }
-    }
-
-    void AddShipsManually()
-    {
-        Console.WriteLine("Escreva as coordenadas dos 10 navios");
-        while (shipsNumber < 10)
-        {
-            ships[shipsNumber] = GetManualShipPosition();
-            var ship = ships[shipsNumber];
-            table[ship.row, ship.column] = '*';
-            shipsNumber++;
-        }
-    }
-
-    (int row, int column) GetManualShipPosition()
-    {
-        while (true)
-        {
-            string coordinate = ReadShipPosition();
-            try
-            {
-                var mappedCoordinate = MapCoordinate(coordinate);
-
-                if (IsShipPositionRepeated(mappedCoordinate))
-                {
-                    throw new ArgumentException("Coordenada repetida");
-                }
-
-                return mappedCoordinate;
-            }
-            catch (ArgumentException e)
-            {
-                Console.WriteLine("Erro: " + e.Message);
-            }
-        }
-    }
-
-    (int row, int column) MapCoordinate(string coordinate)
-    {
-        char letter = char.ToUpper(coordinate[0]);
-
-        if (letter < 'A' || letter > 'J')
-        {
-            throw new ArgumentException("Coordenada fora do intervalo A-J");
-        }
-
-        string numberPart = coordinate.Substring(1);
-
-        if (!int.TryParse(numberPart, out int number) || number < 1 || number > 10)
-        {
-            throw new ArgumentException("Coordenada fora do intervalo 1-10");
-        }
-
-        int column = letter - 'A';
-        int row = number - 1;
-
-        return (row, column);
-    }
-
-    string ReadShipPosition()
-    {
-        while (true)
-        {
-            string? coordinate = Console.ReadLine();
-            if (!string.IsNullOrWhiteSpace(coordinate) && coordinate.Length >= 2)
-            {
-                return coordinate;
-            }
-            Console.WriteLine("Coordenada inválida");
-        }
-    }
-
-    (int row, int column) GetRandomShipPosition()
-    {
-        while (true)
-        {
-            int row = rand.Next(0, table.GetLength(0));
-            int column = rand.Next(0, table.GetLength(1));
-
-            if (!IsShipPositionRepeated((row, column)))
-            {
-                return (row, column);
-            }
-        }
-    }
-
-    bool IsShipPositionRepeated((int row, int column) position)
-    {
-        foreach (var ship in ships.Take(shipsNumber))
-        {
-            if (ship.row == position.row && ship.column == position.column)
-                return true;
-        }
-        return false;
-    }
-
-    void MakeHeaderLineSpacement(int row)
-    {
-        if (row == 0)
-        {
-            Console.WriteLine();
-        }
+        Console.WriteLine();
     }
 
     void MakeLineBreak()
@@ -186,5 +80,125 @@ class Table
         {
             Console.Write($"{table[row - 1, column - 1]} \t");
         }
+    }
+
+    void Initialize()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                table[i, j] = '~';
+            }
+        }
+    }
+
+    void AddShipsRandomly()
+    {
+        while (shipsNumber < 10)
+        {
+            var shipCoord = GetRandomShipPosition();
+            ships[shipsNumber] = new Ship(shipCoord);
+            var ship = ships[shipsNumber];
+            table[ship.Coords.Row, ship.Coords.Column] = '*';
+            shipsNumber++;
+        }
+    }
+
+    void AddShipsManually()
+    {
+        Console.WriteLine("Escreva as coordenadas dos 10 navios");
+        while (shipsNumber < 10)
+        {
+            var shipCoord = GetManualShipPosition();
+            ships[shipsNumber] = new Ship(shipCoord);
+            var ship = ships[shipsNumber];
+            table[ship.Coords.Row, ship.Coords.Column] = '*';
+            shipsNumber++;
+        }
+    }
+
+    Coordinate GetManualShipPosition()
+    {
+        while (true)
+        {
+            try
+            {
+                Coordinate coordinate = new Coordinate(ReadShipPosition());
+                if (IsShipPositionRepeated(coordinate))
+                {
+                    throw new ArgumentException("Coordenada repetida");
+                }
+                return coordinate;
+            }
+            catch (ArgumentException e)
+            {
+                Console.WriteLine("Erro: " + e.Message);
+            }
+        }
+    }
+
+    string ReadShipPosition()
+    {
+        while (true)
+        {
+            string? coordinate = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(coordinate) && coordinate.Length >= 2)
+            {
+                return coordinate;
+            }
+            Console.WriteLine("Coordenada inválida");
+        }
+    }
+
+    Coordinate GetRandomShipPosition()
+    {
+        while (true)
+        {
+            int row = rand.Next(0, table.GetLength(0));
+            int column = rand.Next(0, table.GetLength(1));
+            var coordinate = new Coordinate((row, column));
+
+            if (!IsShipPositionRepeated(coordinate))
+            {
+                return new Coordinate((row, column));
+            }
+        }
+    }
+
+    bool IsShipPositionRepeated(Coordinate position)
+    {
+        foreach (var ship in ships.Take(shipsNumber))
+        {
+            if (ship.Coords.Row == position.Row && ship.Coords.Column == position.Column)
+                return true;
+        }
+        return false;
+    }
+
+    string ReceiveAttack(string attack)
+    {
+        Coordinate attackCoordinates = new Coordinate(attack);
+        foreach (var ship in ships)
+        {
+            if (ship.IsHit(attackCoordinates))
+            {
+                table[ship.Coords.Row, ship.Coords.Column] = 'X';
+                return IsGameWin() ? "WIN" : "HIT";
+            }
+        }
+        return "MISS";
+    }
+
+    bool IsGameWin()
+    {
+        foreach (var ship in ships)
+        {
+            if (ship.Sink == false)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 }
