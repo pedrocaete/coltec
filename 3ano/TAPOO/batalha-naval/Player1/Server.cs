@@ -1,31 +1,46 @@
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 public class Server
 {
-    private NetworkStream stream;
+    readonly IMessageStream _messageStream;
+    readonly TcpListener _listener;
+    readonly TcpClient _client;
+
+    public Server(IMessageStream messageStream, TcpListener listener, TcpClient client)
+    {
+        _messageStream = messageStream;
+        _listener = listener;
+        _client = client;
+    }
 
     public Server(int port)
+        : this(AcceptConnection(port, out var listener, out var client), listener, client) { }
+
+    private static IMessageStream AcceptConnection(int port, out TcpListener listener, out TcpClient client)
     {
-        var listener = new TcpListener(IPAddress.Any, port);
+        listener = new TcpListener(IPAddress.Any, port);
         listener.Start();
         Console.WriteLine($"Aguardando Player2 na porta {port}...");
-        var client = listener.AcceptTcpClient();
-        stream = client.GetStream();
+        client = listener.AcceptTcpClient();
         Console.WriteLine("Player2 conectado!");
+        return new NetworkMessageStream(client.GetStream());
     }
 
     public void Send(string msg)
     {
-        var data = Encoding.ASCII.GetBytes(msg);
-        stream.Write(data, 0, data.Length);
+        _messageStream.Send(msg);
     }
 
     public string Receive()
     {
-        var buf = new byte[32];
-        int len = stream.Read(buf, 0, buf.Length);
-        return Encoding.ASCII.GetString(buf, 0, len);
+        return _messageStream.Receive();
+    }
+
+    public void Close()
+    {
+        _messageStream?.Close();
+        _client?.Close();
+        _listener?.Stop();
     }
 }

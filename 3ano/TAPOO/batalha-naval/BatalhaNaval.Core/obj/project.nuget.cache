@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "NxiUYHnlOdI=",
+  "success": true,
+  "projectFilePath": "/home/pedro/School/3ano/TAPOO/batalha-naval/BatalhaNaval.Core/BatalhaNaval.Core.csproj",
+  "expectedPackageFiles": [
+    "/home/pedro/.nuget/packages/microsoft.aspnetcore.app.ref/9.0.4/microsoft.aspnetcore.app.ref.9.0.4.nupkg.sha512"
+  ],
+  "logs": []
+}

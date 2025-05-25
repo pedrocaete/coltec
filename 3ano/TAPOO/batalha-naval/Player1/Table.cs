@@ -1,120 +1,50 @@
-class Table
+public class Table : TableBase
 {
-    char[,] table = new char[10, 10];
-    int shipsNumber = 0;
-    Ship[] ships;
-    Random rand = new Random();
+    private const int MaxShips = 10;
+    private readonly Random _rand;
+    int _shipsNumber = 0;
+    Ship[] _ships;
 
-    public Table()
+    public Table(IConsole console, Random? random = null) : base(console)
     {
-        ships = new Ship[10];
+        _rand = random ?? new Random();
+        _ships = new Ship[MaxShips];
     }
 
     public void CreateTableWithRandomShipsPositions()
     {
-        Initialize();
         AddShipsRandomly();
         Show();
     }
 
     public void CreateTableWithManualShipPositions()
     {
-        Initialize();
         AddShipsManually();
         Show();
     }
 
-    public void Show()
-    {
-        MakeTable();
-    }
-
-    void MakeTable()
-    {
-
-        for (int i = 0; i < 11; i++)
-        {
-            for (int j = 0; j < 11; j++)
-            {
-                MakeTableCompenents(i, j);
-            }
-            if (IsHeader(i))
-            {
-                MakeHeaderLineSpacement();
-            }
-            MakeLineBreak();
-        }
-    }
-
-    bool IsHeader(int row)
-    {
-        return row == 0 ? true : false;
-    }
-
-    void MakeHeaderLineSpacement()
-    {
-        Console.WriteLine();
-    }
-
-    void MakeLineBreak()
-    {
-        Console.WriteLine();
-    }
-
-    void MakeTableCompenents(int row, int column)
-    {
-        if (row == 0 && column == 0)
-        {
-            Console.Write("\t");
-        }
-        else if (row == 0)
-        {
-            char letter = (char)('A' + column - 1);
-            Console.Write($"{letter} \t");
-        }
-        else if (column == 0)
-        {
-            Console.Write($"{row} \t");
-        }
-        else
-        {
-            Console.Write($"{table[row - 1, column - 1]} \t");
-        }
-    }
-
-    void Initialize()
-    {
-        for (int i = 0; i < 10; i++)
-        {
-            for (int j = 0; j < 10; j++)
-            {
-                table[i, j] = '~';
-            }
-        }
-    }
-
     void AddShipsRandomly()
     {
-        while (shipsNumber < 10)
+        while (_shipsNumber < MaxShips)
         {
             var shipCoord = GetRandomShipPosition();
-            ships[shipsNumber] = new Ship(shipCoord);
-            var ship = ships[shipsNumber];
-            table[ship.Coords.Row, ship.Coords.Column] = '*';
-            shipsNumber++;
+            _ships[_shipsNumber] = new Ship(shipCoord);
+            var ship = _ships[_shipsNumber];
+            _table[ship.Coords.Row, ship.Coords.Column] = '*';
+            _shipsNumber++;
         }
     }
 
     void AddShipsManually()
     {
-        Console.WriteLine("Escreva as coordenadas dos 10 navios");
-        while (shipsNumber < 10)
+        _console.WriteLine($"Escreva as coordenadas dos {MaxShips} navios");
+        while (_shipsNumber < MaxShips)
         {
             var shipCoord = GetManualShipPosition();
-            ships[shipsNumber] = new Ship(shipCoord);
-            var ship = ships[shipsNumber];
-            table[ship.Coords.Row, ship.Coords.Column] = '*';
-            shipsNumber++;
+            _ships[_shipsNumber] = new Ship(shipCoord);
+            var ship = _ships[_shipsNumber];
+            _table[ship.Coords.Row, ship.Coords.Column] = '*';
+            _shipsNumber++;
         }
     }
 
@@ -133,7 +63,7 @@ class Table
             }
             catch (ArgumentException e)
             {
-                Console.WriteLine("Erro: " + e.Message);
+                _console.WriteLine("Erro: " + e.Message);
             }
         }
     }
@@ -142,12 +72,12 @@ class Table
     {
         while (true)
         {
-            string? coordinate = Console.ReadLine();
+            string? coordinate = _console.ReadLine();
             if (!string.IsNullOrWhiteSpace(coordinate) && coordinate.Length >= 2)
             {
                 return coordinate;
             }
-            Console.WriteLine("Coordenada inválida");
+            _console.WriteLine("Coordenada inválida");
         }
     }
 
@@ -155,8 +85,8 @@ class Table
     {
         while (true)
         {
-            int row = rand.Next(0, table.GetLength(0));
-            int column = rand.Next(0, table.GetLength(1));
+            int row = _rand.Next(0, _table.GetLength(0));
+            int column = _rand.Next(0, _table.GetLength(1));
             var coordinate = new Coordinate((row, column));
 
             if (!IsShipPositionRepeated(coordinate))
@@ -168,7 +98,7 @@ class Table
 
     bool IsShipPositionRepeated(Coordinate position)
     {
-        foreach (var ship in ships.Take(shipsNumber))
+        foreach (var ship in _ships.Take(_shipsNumber))
         {
             if (ship.Coords.Row == position.Row && ship.Coords.Column == position.Column)
                 return true;
@@ -176,29 +106,25 @@ class Table
         return false;
     }
 
-    string ReceiveAttack(string attack)
+    public string ReceiveAttack(string attack)
     {
         Coordinate attackCoordinates = new Coordinate(attack);
-        foreach (var ship in ships)
+        foreach (var ship in _ships)
         {
             if (ship.IsHit(attackCoordinates))
             {
-                table[ship.Coords.Row, ship.Coords.Column] = 'X';
+                _table[ship.Coords.Row, ship.Coords.Column] = 'X';
+                Show();
                 return IsGameWin() ? "WIN" : "HIT";
             }
         }
+        _table[attackCoordinates.Row, attackCoordinates.Column] = 'O';
+        Show();
         return "MISS";
     }
 
-    bool IsGameWin()
+    public bool IsGameWin()
     {
-        foreach (var ship in ships)
-        {
-            if (ship.Sink == false)
-            {
-                return false;
-            }
-        }
-        return true;
+        return _ships.Take(_shipsNumber).All(ship => ship.Sink);
     }
 }
