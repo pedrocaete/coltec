@@ -1,4 +1,3 @@
-using System;
 using System.Buffers;
 using System.Diagnostics;
 
@@ -6,32 +5,47 @@ public class ImageProcessor
 {
     private const int IMAGE_WIDTH = 800;
     private const int IMAGE_HEIGHT = 600;
+    private const int TOTAL_PIXELS = IMAGE_HEIGHT * IMAGE_WIDTH;
     private const int TOTAL_IMAGES = 500;
 
     public static void ProcessImages()
     {
-        Console.WriteLine("Iniciando processamento de imagens (versão trivial)...");
+        Console.WriteLine("Iniciando processamento de imagens (versão otimizada)...");
 
         var stopwatch = Stopwatch.StartNew();
         int processedCount = 0;
-
-        for (int imageIndex = 0; imageIndex < TOTAL_IMAGES; imageIndex++)
+        var pool = ArrayPool<PixelRGB>.Shared;
+        PixelRGB[] blurred = default!;
+        PixelRGB[] imageArray = default!;
+        try
         {
-            // Gera uma imagem sintética
-            PixelRGB[,] originalImage = GenerateSyntheticImage(imageIndex);
+            blurred = pool.Rent(TOTAL_PIXELS);
+            imageArray = pool.Rent(TOTAL_PIXELS);
 
-            // Aplica filtro blur (cria novo array a cada operação)
-            PixelRGB[] blurredImage = ApplyBlurFilter(originalImage);
-
-            // Simula salvamento
-            SaveImage(blurredImage, $"processed_{imageIndex}.jpg");
-            processedCount++;
-
-            if (imageIndex % 50 == 0)
+            for (int imageIndex = 0; imageIndex < TOTAL_IMAGES; imageIndex++)
             {
-                Console.WriteLine($"Processadas {imageIndex} imagens...");
+                GenerateSyntheticImage(imageIndex, imageArray);
+                ApplyBlurFilter(imageArray, blurred);
+
+                SaveImage(blurred, $"processed_{imageIndex}.jpg");
+                processedCount++;
+
+                if (imageIndex % 50 == 0)
+                {
+                    Console.WriteLine($"Processadas {imageIndex} imagens...");
+                }
             }
         }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Erro: {e.Message}");
+        }
+        finally
+        {
+            pool.Return(blurred);
+            pool.Return(imageArray);
+        }
+
 
         stopwatch.Stop();
 
@@ -41,60 +55,39 @@ public class ImageProcessor
         Console.WriteLine($"Tempo médio por imagem: {stopwatch.ElapsedMilliseconds / (double)processedCount:F2} ms");
     }
 
-    private static PixelRGB[,] GenerateSyntheticImage(int seed)
+    private static void GenerateSyntheticImage(int seed, PixelRGB[] image)
     {
-        var image = new PixelRGB[IMAGE_HEIGHT, IMAGE_WIDTH];
         var random = new Random(seed);
-
-        for (int y = 0; y < IMAGE_HEIGHT; y++)
+        for (int y = 0; y < IMAGE_HEIGHT - 1; y++)
         {
-            for (int x = 0; x < IMAGE_WIDTH; x++)
+            int rowStart = y * IMAGE_WIDTH;
+            for (int x = 0; x < IMAGE_WIDTH - 1; x++)
             {
-                image[y, x] = new PixelRGB(
+                image[rowStart + x] = new PixelRGB(
                     (byte)random.Next(256),
                     (byte)random.Next(256),
                     (byte)random.Next(256)
                 );
             }
         }
-
-        return image;
     }
 
-    private static PixelRGB[] ApplyBlurFilter(PixelRGB[,] original)
+    private static void ApplyBlurFilter(PixelRGB[] original, PixelRGB[] blurred)
     {
-        int height = original.GetLength(0);
-        int width = original.GetLength(1);
-        int totalPixels = height * width;
-        var arrayPool = ArrayPool<PixelRGB>.Shared;
-        PixelRGB[] blurred = default !;
-
-        try
+        for (int y = 0; y < IMAGE_HEIGHT - 1; y++)
         {
-            blurred = arrayPool.Rent(totalPixels);
-
-            for (int y = 0; y < height - 1; y++)
+            int rowStart = y * IMAGE_WIDTH;
+            int nextRowStart = (y + 1) * IMAGE_WIDTH;
+            for (int x = 0; x < IMAGE_WIDTH - 1; x++)
             {
-                for (int x = 0; x < width - 1; x++)
-                {
-                    blurred[y * width + x] = PixelRGB.Average(
-                        original[y, x],
-                        original[y, x + 1],
-                        original[y + 1, x],
-                        original[y + 1, x + 1]
-                    );
-                }
+                blurred[y * IMAGE_WIDTH + x] = PixelRGB.Average(
+                    original[rowStart + x],
+                    original[rowStart + x + 1],
+                    original[nextRowStart + x],
+                    original[nextRowStart + x + 1]
+                );
             }
         }
-        catch(Exception e)
-        {
-            Console.WriteLine($"Erro: {e.Message}");
-        }
-        finally
-        {
-            arrayPool.Return(blurred);
-        }
-        return blurred;
     }
 
     private static void SaveImage(PixelRGB[] image, string filename)
