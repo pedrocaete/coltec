@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿﻿using System;
+using System.Diagnostics;
 using System.Numerics;
 
 public class Program
@@ -10,7 +11,7 @@ public class Program
 
     public static void TestarPerformanceCompleta()
     {
-        int[] tamanhosExercito = { 10_000, 50_000, 100_000, 500_000, 1_000_000 };
+        int[] tamanhosExercito = { 10_000, 50_000, 100_000, 500_000, 1_000_000, 5_000_000, 10_000_000, 20_000_000 };
 
         Console.WriteLine("=== BENCHMARK DE SISTEMA DE COMBATE ===");
         Console.WriteLine($"SIMD Suportado: {Vector.IsHardwareAccelerated}");
@@ -21,36 +22,44 @@ public class Program
         {
             Console.WriteLine($"Testando exércitos de {tamanho:N0} personagens:");
 
-            // Gerar exércitos
             var atacantes = SimuladorCombate.GerarExercito(tamanho, "atacante");
             var defensores = SimuladorCombate.GerarExercito(tamanho, "defensor");
 
-            // Testar versão original
-            var stopwatchOriginal = Stopwatch.StartNew();
-            int danoOriginal = SimuladorCombate.SimularRodadaCombate(atacantes, defensores);
-            stopwatchOriginal.Stop();
-
-            // Converter para SIMD
             var atacantesSIMD = new ExercitoSIMD(tamanho);
             var defensoresSIMD = new ExercitoSIMD(tamanho);
             atacantesSIMD.ConverterDePersonagens(atacantes);
             defensoresSIMD.ConverterDePersonagens(defensores);
 
-            // Testar versão SIMD
+            // Pré-computar números aleatórios uma única vez
+            int[] randomCriticos = new int[tamanho];
+            var rand = new Random(42);
+            for (int i = 0; i < tamanho; i++)
+                randomCriticos[i] = rand.Next(0, 100);
+
+            // Sequencial
+            var stopwatchOriginal = Stopwatch.StartNew();
+            long danoOriginal = SimuladorCombate.SimularRodadaCombate(atacantes, defensores, randomCriticos);
+            stopwatchOriginal.Stop();
+
+            // SIMD
             var stopwatchSIMD = Stopwatch.StartNew();
-            int danoSIMD = SimuladorCombateSIMD.CalcularDanoVetorizado(atacantesSIMD, defensoresSIMD);
+            long danoSIMD = SimuladorCombateSIMD.CalcularDanoVetorizado(atacantesSIMD, defensoresSIMD, randomCriticos);
             stopwatchSIMD.Stop();
 
-            // Calcular speedup
-            double speedup = (double)stopwatchOriginal.ElapsedMilliseconds / stopwatchSIMD.ElapsedMilliseconds;
+            double tempoOriginalMs = Math.Max(1, stopwatchOriginal.ElapsedMilliseconds);
+            double tempoSIMDMs = Math.Max(1, stopwatchSIMD.ElapsedMilliseconds);
+            double speedup = tempoOriginalMs / tempoSIMDMs;
+
+            long dpsOriginal = (long)(danoOriginal * 1000 / tempoOriginalMs);
+            long dpsSIMD = (long)(danoSIMD * 1000 / tempoSIMDMs);
 
             Console.WriteLine($"  Dano Original: {danoOriginal:N0}");
             Console.WriteLine($"  Dano SIMD: {danoSIMD:N0}");
             Console.WriteLine($"  Tempo Original: {stopwatchOriginal.ElapsedMilliseconds}ms");
             Console.WriteLine($"  Tempo SIMD: {stopwatchSIMD.ElapsedMilliseconds}ms");
             Console.WriteLine($"  Speedup: {speedup:F2}x");
-            Console.WriteLine($"  DPS Original: {danoOriginal * 1000 / Math.Max(1, stopwatchOriginal.ElapsedMilliseconds):N0}");
-            Console.WriteLine($"  DPS SIMD: {danoSIMD * 1000 / Math.Max(1, stopwatchSIMD.ElapsedMilliseconds):N0}");
+            Console.WriteLine($"  DPS Original: {dpsOriginal:N0}");
+            Console.WriteLine($"  DPS SIMD: {dpsSIMD:N0}");
             Console.WriteLine();
         }
     }

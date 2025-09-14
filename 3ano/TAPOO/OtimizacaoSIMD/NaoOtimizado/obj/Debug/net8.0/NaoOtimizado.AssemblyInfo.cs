@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NaoOtimizado")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+48139f5e878d74467b6d2d8582b851e1b50e358b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ff4afae562c95a663faa759200661b8d6c63d5ac")]
 [assembly: System.Reflection.AssemblyProductAttribute("NaoOtimizado")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NaoOtimizado")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

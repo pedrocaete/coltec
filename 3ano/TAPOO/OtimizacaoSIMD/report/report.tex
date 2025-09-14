@@ -1,0 +1,365 @@
+\documentclass[
+	12pt,				% tamanho da fonte
+	oneside,			% para impressão em recto e verso. Oposto a oneside
+	a4paper,			% tamanho do papel. 
+	english,			% idioma adicional para hifenização
+	brazil,				% o último idioma é o principal do documento
+	]{abntex2}
+
+% ---
+% Pacotes fundamentais 
+% ---
+\usepackage{lmodern}			% Usa a fonte Latin Modern
+\usepackage[T1]{fontenc}		% Selecao de codigos de fonte.
+\usepackage[utf8]{inputenc}		% Codificacao do documento (conversão automática dos acentos)
+\usepackage{indentfirst}		% Indenta o primeiro parágrafo de cada seção.
+\usepackage{color}				% Controle das cores
+\usepackage{graphicx}			% Inclusão de gráficos
+\usepackage{microtype} 			% para melhorias de justificação
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage[brazilian,hyperpageref]{backref}	 % Paginas com as citações na bibl
+\usepackage[alf]{abntex2cite}	% Citações padrão ABNT
+\usepackage{listings}
+\usepackage{float}
+
+\lstset{
+language=C,
+basicstyle=\ttfamily\footnotesize,
+keywordstyle=\color{blue},
+commentstyle=\color{green},
+stringstyle=\color{red},
+numbers=left,
+numberstyle=\tiny,
+stepnumber=1,
+numbersep=5pt,
+backgroundcolor=\color{lightgray!10},
+showspaces=false,
+showstringspaces=false,
+showtabs=false,
+frame=single,
+rulecolor=\color{black},
+tabsize=2,
+captionpos=b,
+breaklines=true,
+breakatwhitespace=false,
+escapeinside={%}{)}
+}
+
+% --- 
+% CONFIGURAÇÕES DE PACOTES
+% --- 
+
+% ---
+% Configurações do pacote backref
+% Usado sem a opção hyperpageref de backref
+\renewcommand{\backrefpagesname}{Citado na(s) página(s):~}
+% Texto padrão antes do número das páginas
+\renewcommand{\backref}{}
+% Define os textos da citação
+\renewcommand*{\backrefalt}[4]{
+	\ifcase #1 %
+		Nenhuma citação no texto.%
+	\or
+		Citado na página #2.%
+	\else
+		Citado #1 vezes nas páginas #2.%
+	\fi}%
+% ---
+
+% ---
+% Informações de dados para CAPA e FOLHA DE ROSTO
+% ---
+\titulo{Otimização SIMD para Sistema de Combate MMORPG}
+\autor{Pedro Inácio Rodrigues Pontes}
+\local{Belo Horizonte, Brasil}
+\data{2025}
+\instituicao{%
+  Universidade Federal de Minas Gerais
+  \par
+  Colégio Técnico
+  \par
+  Curso Técnico em Desenvolvimento de Sistemas}
+
+\definecolor{blue}{RGB}{41,5,195}
+
+\makeatletter
+\hypersetup{
+     	%pagebackref=true,
+		pdftitle={\@title}, 
+		pdfauthor={\@author},
+    	pdfsubject={\imprimirpreambulo},
+		colorlinks=true,       		% false: boxed links; true: colored links
+    	linkcolor=blue,          	% color of internal links
+    	citecolor=blue,        		% color of links to bibliography
+    	filecolor=magenta,      		% color of file links
+		urlcolor=blue,
+		bookmarksdepth=4
+}
+\makeatother
+
+\renewcommand{\thesection}{\arabic{section}}
+\setlength{\parindent}{1.3cm}
+\setlength{\parskip}{0.2cm} 
+
+\makeindex
+
+
+\begin{document}
+
+\selectlanguage{brazil}
+\frenchspacing 
+
+\imprimircapa
+
+{
+\ABNTEXchapterfont
+
+\textual
+
+% ----------------------------------------------------------
+% Introdução (exemplo de capítulo sem numeração, mas presente no Sumário)
+% ----------------------------------------------------------
+\section{Introdução}
+O objetivo do presente trabalho foi a otimização de um sistema de combate para MMORPG que apresentava problemas de performance durante batalhas massivas envolvendo centenas de milhares de personagens. O código original possuía 3 componentes principais - uma struct \textit{Personagem}, a classe \textit{SimuladorCombate} e a classe \textit{Program} -, onde o gargalo de performance estava localizado no método \textit{SimularRodadaCombate} da classe \textit{SimuladorCombate}.
+O desafio consistia em transformar o sistema sequencial tradicional em uma implementação vetorizada utilizando SIMD (\textit{Single Instruction, Multiple Data}), com o objetivo de processar múltiplos cálculos de dano simultaneamente. Para isso, foi necessário implementar uma nova arquitetura de dados através da classe \textit{ExercitoSIMD}, além de desenvolver uma versão otimizada do simulador de combate na classe \textit{SimuladorCombateSIMD}.
+A principal motivação para esta otimização era resolver o problema de lag durante raids massivas, onde o cálculo sequencial de dano para meio milhão de personagens ou mais causava travamentos no servidor do jogo.
+\section{Desenvolvimento}
+\subsection{Versão Não Otimizada}
+Antes de ser otimizado, o código apresentava uma arquitetura tradicional onde cada personagem era representado por uma struct completa. O sistema processava os cálculos de dano de forma sequencial, elemento por elemento, não aproveitando as capacidades de paralelização oferecidas pelo hardware moderno.
+\subsubsection{Problema de Desigualdade nos Danos}
+Durante os testes iniciais, foi observado que os danos estavam ficando muito desiguais devido à geração aleatória de números para os cálculos de crítico dentro do método \texttt{CalcularDano}. Cada chamada do método gerava um novo número aleatório, causando variações significativas nos resultados e dificultando a comparação entre as versões otimizada e não otimizada.
+Para resolver este problema, foi implementada uma solução onde os números aleatórios são pré-gerados e passados como parâmetro, garantindo que ambas as versões utilizem exatamente os mesmos valores aleatórios e, consequentemente, produzam resultados idênticos.
+\begin{lstlisting}[language=C]
+public class SimuladorCombate
+{
+    private static Random gerador = new Random(42);
+
+    public static int CalcularDano(Personagem atacante, Personagem defensor
+                                                    , int randomCritico)
+    {
+        if (!atacante.Vivo || !defensor.Vivo)
+            return 0;
+
+        int danoBase = Math.Max(1, atacante.Ataque - defensor.Defesa);
+        bool ehCritico = randomCritico < atacante.ChanceCritico;
+
+        if (ehCritico)
+            danoBase = (danoBase * atacante.MultCritico) / 100;
+
+        return danoBase;
+    }
+
+    public static int SimularRodadaCombate(Personagem[] atacantes,
+                    Personagem[] defensores, int[] randomCriticos)
+    {
+        int danoTotal = 0;
+
+        for (int i = 0; i < atacantes.Length && i < defensores.Length; i++)
+        {
+            danoTotal += CalcularDano(atacantes[i], defensores[i], randomCriticos[i]);
+        }
+
+        return danoTotal;
+    }
+
+    public static Personagem[] GerarExercito(int tamanho, string tipo)
+    {
+        Personagem[] exercito = new Personagem[tamanho];
+
+        for (int i = 0; i < tamanho; i++)
+        {
+            if (tipo == "atacante")
+            {
+                exercito[i] = new Personagem
+                {
+                    Ataque = gerador.Next(80, 120), // 80-119 ataque
+                    Defesa = gerador.Next(20, 40), // 20-39 defesa
+                    ChanceCritico = gerador.Next(15, 25), // 15-24% crítico
+                    MultCritico = gerador.Next(180, 220), // 1.8x-2.2x crítico
+                    Vida = gerador.Next(100, 150),
+                    Vivo = true,
+                };
+            }
+            else // defensor
+            {
+                exercito[i] = new Personagem
+                {
+                    Ataque = gerador.Next(60, 80), // menos ataque
+                    Defesa = gerador.Next(40, 70), // mais defesa
+                    ChanceCritico = gerador.Next(10, 20),
+                    MultCritico = gerador.Next(150, 200),
+                    Vida = gerador.Next(120, 180), // mais vida
+                    Vivo = true,
+                };
+            }
+        }
+
+        return exercito;
+    }
+}
+\end{lstlisting}
+\subsection{Versão Otimizada}
+A otimização foi implementada através da reestruturação dos dados e o uso intensivo de operações SIMD. O sistema agora processa múltiplos cálculos de dano simultaneamente, aproveitando a capacidade de processamento vetorial do hardware.
+A classe \textit{ExercitoSIMD} foi criada para organizar os dados de forma otimizada para SIMD:
+\begin{lstlisting}[language=C]
+public static long CalcularDanoVetorizado(ExercitoSIMD atacantes
+                , ExercitoSIMD defensores, int[] randomCriticos)
+{
+ int tamanhoExercito = atacantes.Vivos.Length;
+ int tamanhoVetor = Vector<int>.Count;
+
+ long danoTotal = 0;
+ int limiteSIMD = tamanhoExercito - (tamanhoExercito % tamanhoVetor);
+
+ int[] mascaraVivos = new int[tamanhoExercito];
+ for (int i = 0; i < tamanhoExercito; i++)
+ {
+     mascaraVivos[i] = (atacantes.Vivos[i] && defensores.Vivos[i]) ? 1 : 0;
+ }
+
+ Vector<int> vetorUm = Vector<int>.One;
+ Vector<int> vetorCem = new Vector<int>(100);
+
+ for (int i = 0; i < limiteSIMD; i += tamanhoVetor)
+ {
+     Vector<int> ataques = new Vector<int>(atacantes.Ataques, i);
+     Vector<int> defesas = new Vector<int>(defensores.Defesas, i);
+     Vector<int> chancesAtacante = new Vector<int>(atacantes.ChancesCritico, i);
+     Vector<int> multAtacante = new Vector<int>(atacantes.MultCriticos, i);
+     Vector<int> randoms = new Vector<int>(randomCriticos, i);
+     Vector<int> mascaras = new Vector<int>(mascaraVivos, i);
+
+     Vector<int> danoBase = Vector.Max(
+         Vector.Subtract(ataques, defesas),
+         vetorUm
+     );
+
+     Vector<int> ehCritico = Vector.LessThan(randoms, chancesAtacante);
+
+     Vector<int> multiplicador = Vector.ConditionalSelect(
+         ehCritico,
+         multAtacante,
+         vetorCem
+     );
+
+     Vector<int> danoComCritico = Vector.Multiply(danoBase, multiplicador);
+     Vector<int> danoNormalizado = Vector.Divide(danoComCritico, vetorCem);
+     Vector<int> danoFinal = Vector.Multiply(danoNormalizado, mascaras);
+
+     danoTotal += Vector.Dot(danoFinal, vetorUm);
+ }
+
+ for (int i = limiteSIMD; i < tamanhoExercito; i++)
+ {
+     if (mascaraVivos[i] == 1)
+     {
+         int danoBase = Math.Max(atacantes.Ataques[i] - defensores.Defesas[i], 1);
+         bool critico = randomCriticos[i] < atacantes.ChancesCritico[i];
+         int danoFinal = critico ?
+             (danoBase * atacantes.MultCriticos[i]) / 100 :
+             danoBase;
+
+         danoTotal += danoFinal;
+     }
+ }
+
+ return danoTotal;
+}
+
+\end{lstlisting}
+\subsubsection{Adaptações para Consistência de Resultados}
+A versão SIMD também foi adaptada para utilizar o mesmo array de números aleatórios pré-gerados, garantindo que os cálculos de crítico sejam idênticos entre as duas implementações. Esta modificação foi essencial para validar a correção dos resultados da otimização SIMD, assegurando que as diferenças de performance observadas fossem devidas exclusivamente às melhorias algorítmicas e não a variações nos dados de entrada.
+As adaptações incluíram modificações na classe \textit{Program.cs} para gerar um único array de números aleatórios compartilhado entre ambas as versões, e ajustes no método \textit{SimularRodadaCombate} da versão SIMD para processar estes valores de forma vetorizada.
+\subsection{Sistema de Benchmark}
+O sistema de benchmark foi implementado para testar diferentes tamanhos de exército, desde 10.000 até 20.000.000 de personagens, permitindo avaliar o ganho de performance em cenários de escala massiva típicos de MMORPGs modernos. A implementação da geração controlada de números aleatórios garantiu que todos os testes fossem realizados com dados idênticos, proporcionando medições precisas e confiáveis do speedup obtido.
+
+\section{Resultados}
+
+\begin{verbatim}
+=== BENCHMARK DE SISTEMA DE COMBATE ===
+SIMD Suportado: True
+Elementos por Vetor: 8
+
+Testando exércitos de 10,000 personagens:
+  Dano Original: 540,281
+  Dano SIMD: 540,281
+  Tempo Original: 1ms
+  Tempo SIMD: 4ms
+  Speedup: 0.25x
+  DPS Original: 540,281,000
+  DPS SIMD: 135,070,250
+
+Testando exércitos de 50,000 personagens:
+  Dano Original: 2,683,840
+  Dano SIMD: 2,683,840
+  Tempo Original: 2ms
+  Tempo SIMD: 3ms
+  Speedup: 0.67x
+  DPS Original: 1,341,920,000
+  DPS SIMD: 894,613,333
+
+Testando exércitos de 100,000 personagens:
+  Dano Original: 5,375,057
+  Dano SIMD: 5,375,057
+  Tempo Original: 5ms
+  Tempo SIMD: 7ms
+  Speedup: 0.71x
+  DPS Original: 1,075,011,400
+  DPS SIMD: 767,865,285
+
+Testando exércitos de 500,000 personagens:
+  Dano Original: 26,844,937
+  Dano SIMD: 26,844,937
+  Tempo Original: 13ms
+  Tempo SIMD: 16ms
+  Speedup: 0.81x
+  DPS Original: 2,064,995,153
+  DPS SIMD: 1,677,808,562
+
+Testando exércitos de 1,000,000 personagens:
+  Dano Original: 53,642,338
+  Dano SIMD: 53,642,338
+  Tempo Original: 27ms
+  Tempo SIMD: 25ms
+  Speedup: 1.08x
+  DPS Original: 1,986,753,259
+  DPS SIMD: 2,145,693,520
+
+Testando exércitos de 5,000,000 personagens:
+  Dano Original: 268,260,983
+  Dano SIMD: 268,260,983
+  Tempo Original: 82ms
+  Tempo SIMD: 73ms
+  Speedup: 1.12x
+  DPS Original: 3,271,475,402
+  DPS SIMD: 3,674,807,986
+
+Testando exércitos de 10,000,000 personagens:
+  Dano Original: 536,496,781
+  Dano SIMD: 536,496,781
+  Tempo Original: 172ms
+  Tempo SIMD: 154ms
+  Speedup: 1.12x
+  DPS Original: 3,119,167,331
+  DPS SIMD: 3,483,745,331
+
+Testando exércitos de 20,000,000 personagens:
+  Dano Original: 1,072,784,022
+  Dano SIMD: 1,072,784,022
+  Tempo Original: 560ms
+  Tempo SIMD: 488ms
+  Speedup: 1.15x
+  DPS Original: 1,915,685,753
+  DPS SIMD: 2,198,327,913
+\end{verbatim}
+
+\section{Conclusão}
+A otimização foi alcançada com sucesso. A implementação SIMD demonstrou ganhos significativos de performance que aumentaram proporcionalmente com o tamanho dos exércitos processados. O hardware testado suportava SIMD com 8 elementos por vetor, processando múltiplos cálculos de dano simultaneamente utilizando as instruções vetorizadas do processador.
+Os resultados demonstraram que o SIMD é mais eficaz em cenários de grande escala. Para exércitos menores (10.000 personagens), o overhead das operações SIMD resultou em speedup de 0.25x, mas conforme o tamanho dos exércitos aumentou, os ganhos se tornaram evidentes. Para 1.000.000 de personagens, o speedup atingiu 1.08x, e para 20.000.000 de personagens, o speedup foi de 1.15x, com tempo caindo de 560ms para 488ms.
+O DPS (\textit{Damage Per Second}) também apresentou melhorias nos cenários de maior escala, saltando de aproximadamente 1,92 bilhões para 2,20 bilhões de danos por segundo no cenário de 20 milhões de personagens. Para 5.000.000 de personagens, o DPS melhorou de 3,27 bilhões para 3,67 bilhões por segundo.
+A solução implementada para garantir a consistência dos resultados através da geração controlada de números aleatórios foi fundamental para validar a correção da implementação SIMD. Esta abordagem permitiu confirmar que ambas as versões produzem resultados idênticos, diferindo apenas na performance, o que é essencial para a confiabilidade do sistema em um ambiente de produção.
+A nova arquitetura de dados combinada com operações SIMD proporcionou melhorias substanciais no throughput do sistema para cenários massivos, permitindo que o simulador processe battles épicas com dezenas de milhões de personagens de forma mais eficiente. A otimização se mostrou especialmente eficaz em cenários de grande escala, onde o overhead de setup das operações SIMD é compensado pelo volume de dados processados em paralelo. Os resultados confirmam que, embora o SIMD tenha overhead inicial em volumes pequenos, a técnica é viável e vantajosa para aplicações de jogos em tempo real que envolvem processamento massivo de dados.
+\end{document}
+
+\end{document}
